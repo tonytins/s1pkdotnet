@@ -1,11 +1,16 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace Sims1Pkg;
 
+/// <summary>
+/// Main package handler for Sims 1 package files (.s1pk).
+/// Implements extraction and compression of package archives.
+/// </summary>
 public class TS1Package : ISPackage
 {
     /// <summary>
@@ -14,6 +19,9 @@ public class TS1Package : ISPackage
     /// Inspired by Sims2Pack's comprehensive format support.
     /// </summary>
     private static readonly string[] SupportedExtensions = {
+        // Metadata
+        ".xml",    // XML metadata files
+        
         // Core resource formats
         ".iff",    // IFF format - various resources
         ".far",    // Fast Access Resource - resource archives
@@ -45,9 +53,26 @@ public class TS1Package : ISPackage
         // Data files
         ".dat"     // Generic data files
     };
+
     private const string MetadataFileName = "metadata.xml";
 
+    /// <summary>
+    /// Event raised when progress is made during package operations.
+    /// </summary>
+    public event PackageProgressEventHandler? Progress;
+
+    /// <summary>
+    /// Metadata from the package.
+    /// </summary>
     public PackageMetadata Metadata { get; private set; } = new();
+
+    /// <summary>
+    /// Gets all supported file extensions.
+    /// </summary>
+    public static IEnumerable<string> GetSupportedExtensions()
+    {
+        return SupportedExtensions;
+    }
 
     /// <summary>
     /// Extracts files from a package archive to the current directory.
@@ -55,7 +80,7 @@ public class TS1Package : ISPackage
     /// <param name="packagePath">Path to the .s1pk file.</param>
     public void Extract(string packagePath)
     {
-        Extract(packagePath, null);
+        ExtractAsync(packagePath, null).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -64,6 +89,16 @@ public class TS1Package : ISPackage
     /// <param name="packagePath">Path to the .s1pk file.</param>
     /// <param name="outputDirectory">Directory to extract files to. Defaults to package directory.</param>
     public void Extract(string packagePath, string? outputDirectory)
+    {
+        ExtractAsync(packagePath, outputDirectory).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Extracts files from a package archive asynchronously.
+    /// </summary>
+    /// <param name="packagePath">Path to the .s1pk file.</param>
+    /// <param name="outputDirectory">Directory to extract files to. Defaults to package directory.</param>
+    public async Task ExtractAsync(string packagePath, string? outputDirectory = null)
     {
         if (!File.Exists(packagePath))
         {
@@ -75,8 +110,8 @@ public class TS1Package : ISPackage
 
         using var zip = ZipFile.OpenRead(packagePath);
 
+        // Validate archive
         bool metadataFound = false;
-
         foreach (var entry in zip.Entries)
         {
             if (entry.FullName.Equals(MetadataFileName, StringComparison.OrdinalIgnoreCase))
@@ -89,6 +124,7 @@ public class TS1Package : ISPackage
                 "Cannot extract files: archive must contain 'metadata.xml' file.");
         }
 
+        // Read metadata
         var metadataEntry = zip.GetEntry(MetadataFileName);
         if (metadataEntry == null)
         {
@@ -98,31 +134,37 @@ public class TS1Package : ISPackage
         using (var stream = metadataEntry.Open())
         using (var reader = new StreamReader(stream))
         {
-            string xml = reader.ReadToEnd();
+            string xml = await reader.ReadToEndAsync();
             Metadata = PackageMetadata.FromXml(xml) ?? new PackageMetadata();
-            Console.WriteLine("Package metadata:");
-            Console.WriteLine("  Name: " + Metadata.Name);
-            Console.WriteLine("  Author: " + Metadata.Author);
-            Console.WriteLine("  Date: " + Metadata.Date);
         }
 
+        Progress?.Invoke(this, new PackageProgressEventArgs(0, "Starting extraction", MetadataFileName));
+
+        // Extract files
         int extractedCount = 0;
+        int totalSupported = zip.Entries.Count(e => IsSupportedFile(e.FullName));
+        
         foreach (var entry in zip.Entries)
         {
             if (IsSupportedFile(entry.FullName))
             {
                 string destinationPath = Path.Combine(extractPath, entry.FullName);
                 string? directory = Path.GetDirectoryName(destinationPath);
+                
                 if (!string.IsNullOrEmpty(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
+                
                 entry.ExtractToFile(destinationPath, overwrite: true);
-                Console.WriteLine("Extracted: " + entry.FullName);
                 extractedCount++;
+                
+                int percent = (int)((float)extractedCount / totalSupported * 100);
+                Progress?.Invoke(this, new PackageProgressEventArgs(percent, "Extracting files", entry.FullName));
             }
         }
-        Console.WriteLine("Extracted " + extractedCount + " files.");
+
+        Progress?.Invoke(this, new PackageProgressEventArgs(100, "Extraction complete"));
     }
 
     /// <summary>
@@ -132,7 +174,7 @@ public class TS1Package : ISPackage
     /// <param name="packagePath">Path for the output .s1pk file.</param>
     public void Compress(string sourceDirectory, string packagePath)
     {
-        Compress(sourceDirectory, packagePath, null);
+        CompressAsync(sourceDirectory, packagePath, null).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -142,6 +184,17 @@ public class TS1Package : ISPackage
     /// <param name="packagePath">Path for the output .s1pk file.</param>
     /// <param name="metadata">Package metadata to include. If null, default metadata is created.</param>
     public void Compress(string sourceDirectory, string packagePath, PackageMetadata? metadata)
+    {
+        CompressAsync(sourceDirectory, packagePath, metadata).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Compresses files into a package archive asynchronously.
+    /// </summary>
+    /// <param name="sourceDirectory">Directory containing files to compress.</param>
+    /// <param name="packagePath">Path for the output .s1pk file.</param>
+    /// <param name="metadata">Package metadata to include. If null, default metadata is created.</param>
+    public async Task CompressAsync(string sourceDirectory, string packagePath, PackageMetadata? metadata = null)
     {
         if (!Directory.Exists(sourceDirectory))
         {
@@ -175,7 +228,7 @@ public class TS1Package : ISPackage
             {
                 using (var reader = new StreamReader(metadataPath))
                 {
-                    packageMetadata = PackageMetadata.FromXml(reader.ReadToEnd());
+                    packageMetadata = PackageMetadata.FromXml(await reader.ReadToEndAsync());
                 }
             }
             
@@ -191,16 +244,27 @@ public class TS1Package : ISPackage
         string outputDir = Path.GetDirectoryName(packagePath) ?? Environment.CurrentDirectory;
         Directory.CreateDirectory(outputDir);
 
+        Progress?.Invoke(this, new PackageProgressEventArgs(0, "Starting compression"));
+
         using (var zip = ZipFile.Open(packagePath, ZipArchiveMode.Create))
         {
+            // Add metadata.xml
             var metadataEntry = zip.CreateEntry(MetadataFileName, CompressionLevel.Optimal);
             using (var stream = metadataEntry.Open())
             using (var writer = new StreamWriter(stream))
             {
-                writer.Write(packageMetadata.ToXml());
+                await writer.WriteAsync(packageMetadata.ToXml());
             }
-            Console.WriteLine("Added metadata.xml");
+            Progress?.Invoke(this, new PackageProgressEventArgs(5, "Added metadata.xml"));
 
+            // Count total files to compress for progress
+            int totalFiles = 0;
+            foreach (var ext in SupportedExtensions)
+            {
+                totalFiles += Directory.GetFiles(sourceDirectory, "*" + ext, SearchOption.AllDirectories).Count();
+            }
+
+            // Add all supported files
             int addedCount = 0;
             foreach (var ext in SupportedExtensions)
             {
@@ -209,11 +273,14 @@ public class TS1Package : ISPackage
                 {
                     string relativePath = Path.GetRelativePath(sourceDirectory, file);
                     zip.CreateEntryFromFile(file, relativePath, CompressionLevel.Optimal);
-                    Console.WriteLine("Added: " + relativePath);
                     addedCount++;
+                    
+                    int percent = 5 + (int)((float)addedCount / totalFiles * 95);
+                    Progress?.Invoke(this, new PackageProgressEventArgs(percent, "Compressing files", relativePath));
                 }
             }
-            Console.WriteLine("Added " + addedCount + " files.");
+
+            Progress?.Invoke(this, new PackageProgressEventArgs(100, "Compression complete"));
         }
     }
 

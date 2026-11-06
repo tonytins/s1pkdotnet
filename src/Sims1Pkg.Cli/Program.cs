@@ -1,7 +1,7 @@
 using System;
 using Sims1Pkg;
 
-namespace Sims1Pkg;
+namespace Sims1Pkg.Cli;
 
 /// <summary>
 /// Entry point for the Sims1Pkg command-line utility.
@@ -75,6 +75,14 @@ public class Program
         string? outputDirectory = args.Length > 2 ? args[2] : null;
 
         var package = new TS1Package();
+        package.Progress += (sender, e) => 
+        {
+            if (e.CurrentFile != null)
+                Console.WriteLine("  " + e.Message + ": " + e.CurrentFile);
+            else
+                Console.WriteLine("  " + e.Message);
+        };
+        
         package.Extract(packagePath, outputDirectory);
         
         return 0;
@@ -99,6 +107,14 @@ public class Program
         var metadata = ParseMetadata(args, 3);
 
         var package = new TS1Package();
+        package.Progress += (sender, e) => 
+        {
+            if (e.CurrentFile != null)
+                Console.WriteLine("  " + e.Message + ": " + e.CurrentFile);
+            else
+                Console.WriteLine("  " + e.Message);
+        };
+        
         package.Compress(sourceDirectory, packagePath, metadata);
         
         return 0;
@@ -190,7 +206,7 @@ public class Program
         Console.WriteLine();
         Console.WriteLine("Notes:");
         Console.WriteLine("  - Archives must contain 'metadata.xml' file");
-        Console.WriteLine("  - Supported file types: .iff, .far, .cmx, .skn, .bmp, .hdb, .house, .family, .sims, .HIT, .hot, .hsm, .XA, .cht, .tds, .pal, .dat");
+        Console.WriteLine("  - Supported file types: .iff, .far, .cmx, .skn, .bmp, .hdb, .house, .family, .sims, .cht, .HIT, .hot, .hsm, .XA, .tds, .pal, .dat");
         Console.WriteLine("  - Format inspired by Sims2Pack");
     }
 }
