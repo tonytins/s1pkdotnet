@@ -18,21 +18,21 @@ Complete the current refactoring and establish a solid foundation:
 - [x] Reorganize project structure (src/Sims1Pkg/)
 - [x] Update documentation to match new direction
 - [x] Remove outdated layout directory
-- [ ] Verify all file types work correctly in practice
-- [ ] Test edge cases (empty archives, corrupt files, etc.)
+- [x] Verify all file types work correctly in practice
+- [x] Test edge cases (empty archives, corrupt files, etc.)
 
 ## Medium-term
 
 Split into a reusable library and add GUI support:
 
-- [ ] Create Sims1Pkg.Core library project
-- [ ] Move core logic (ISPackage, PackageMetadata, TS1Package) to Core
-- [ ] Add progress reporting events/interface to Core
-- [ ] Remove Console dependencies from Core
-- [ ] Create Sims1Pkg.Cli project that references Core
-- [ ] Verify CLI still works with library split
-- [ ] Create Sims1Pkg.Gui project with Avalonia
-- [ ] Implement basic GUI: file browser, extract/compress buttons
+- [x] Create Sims1Pkg.Core library project
+- [x] Move core logic (ISPackage, PackageMetadata, TS1Package) to Core
+- [x] Add progress reporting events/interface to Core
+- [x] Remove Console dependencies from Core
+- [x] Create Sims1Pkg.Cli project that references Core
+- [x] Verify CLI still works with library split
+- [x] Create Sims1Pkg.Gui project with Avalonia
+- [x] Implement basic GUI: file browser, extract/compress buttons
 - [ ] Add package inspector (view contents without extracting)
 - [ ] Add metadata editor
 

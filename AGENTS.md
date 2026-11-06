@@ -2,17 +2,17 @@
 
 ## Overview
 
-**Sims1Pkg** is an open package format for Sims 1 content, inspired by Sims2Pack. It provides command-line utilities for compressing and extracting Sims 1 files into a standardized, interoperable package format using ZIP compression and XML metadata.
+**Sims1Pkg** is an open package format for Sims 1 content, inspired by Sims2Pack. It provides command-line utilities and a GUI for compressing and extracting Sims 1 files into a standardized, interoperable package format using ZIP compression and XML metadata.
 
 The project aims to create a modern, open alternative to the proprietary `.far` format used by The Sims 1, making it easier to share, distribute, and manage Sims 1 custom content across different tools and platforms.
 
 ## Vision
 
-Sims1Pkg is evolving into a comprehensive ecosystem:
+Sims1Pkg is a comprehensive ecosystem:
 
 1. **Core Library** (`Sims1Pkg.Core`) - Reusable package handling logic
-2. **CLI Tool** (`Sims1Pkg`) - Command-line interface for scripting and automation
-3. **GUI Application** (Future) - User-friendly interface using Avalonia
+2. **CLI Tool** (`Sims1Pkg.Cli`) - Command-line interface for scripting and automation
+3. **GUI Application** (`Sims1Pkg.Gui`) - User-friendly interface using Avalonia
 
 This modular approach allows the core functionality to be used by other tools while providing both CLI and GUI options for end users.
 
@@ -27,13 +27,25 @@ s1pkdotnet/
 ├── .gitignore                 # Git ignore rules
 ├── UNLICENSE                  # Primary license (public domain)
 ├── COPYING                   # Fallback license (BSD-3-Clause)
+├── doc/
+│   ├── README.md             # Documentation overview
+│   └── roadmap.md            # Project roadmap
 └── src/
-    └── Sims1Pkg/
-        ├── Sims1Pkg.csproj    # .NET 8.0 console application
-        ├── Program.cs         # CLI entry point and argument parsing
-        ├── ISPackage.cs       # Interfaces: ISPackage, ISMetadata
-        ├── PackageMetadata.cs # Metadata DTO with XML serialization
-        └── TS1Package.cs      # Main package implementation
+    ├── Sims1Pkg.Core/
+    │   ├── Sims1Pkg.Core.csproj    # .NET 8.0 library
+    │   ├── ISPackage.cs            # Interface definitions
+    │   ├── ISMetadata.cs           # Metadata interface
+    │   ├── PackageMetadata.cs      # XML metadata DTO
+    │   ├── PackageProgressEventArgs.cs  # Progress event args
+    │   └── TS1Package.cs           # Main package implementation
+    ├── Sims1Pkg.Cli/
+    │   ├── Sims1Pkg.Cli.csproj     # .NET 8.0 console application
+    │   └── Program.cs              # CLI entry point and argument parsing
+    └── Sims1Pkg.Gui/
+        ├── Sims1Pkg.Gui.csproj     # .NET 8.0 Avalonia application
+        ├── Program.cs              # GUI entry point
+        ├── App.axaml + App.axaml.cs # Application definition
+        └── MainWindow.axaml + MainWindow.axaml.cs  # Main window
 ```
 
 ## Supported File Types
@@ -54,14 +66,16 @@ Sims1Pkg supports all major Sims 1 file formats:
 dotnet build
 
 # Build specific project
-dotnet build src/Sims1Pkg/Sims1Pkg.csproj
+dotnet build src/Sims1Pkg.Core/Sims1Pkg.Core.csproj
+dotnet build src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj
+dotnet build src/Sims1Pkg.Gui/Sims1Pkg.Gui.csproj
 
 # Run CLI
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj extract package.s1pk
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj compress source/ package.s1pk
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj extract package.s1pk
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj compress source/ package.s1pk
 
 # Show help
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj help
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj help
 ```
 
 ## Package Format Specification
@@ -135,13 +149,13 @@ A valid `.s1pk` archive:
 - Document new capabilities in README.md
 - Consider backward compatibility for existing archives
 
-### Library Split (Future)
-When splitting into a library:
-1. Create `Sims1Pkg.Core` project with interfaces and implementations
-2. Move `ISPackage.cs`, `ISMetadata.cs`, `PackageMetadata.cs`, `TS1Package.cs` to Core
-3. Keep `Program.cs` in CLI project
-4. Add `Sims1Pkg.Gui` project for Avalonia GUI
-5. Update solution file with all three projects
+### Library Split
+The library split is now complete:
+- `Sims1Pkg.Core` contains all core package handling logic
+- `Sims1Pkg.Cli` provides the command-line interface
+- `Sims1Pkg.Gui` provides the Avalonia-based GUI
+
+The three projects are independent and can be built/used separately.
 
 ### Testing
 - Manual testing is currently sufficient for this small-scale project

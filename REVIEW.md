@@ -63,11 +63,13 @@ Use this checklist when reviewing changes to Sims1Pkg. The focus is on correctne
 - [ ] Is AGENTS.md updated for architectural changes?
 - [ ] Are there any comments explaining non-obvious logic?
 
-### Architecture (For Library Split)
+### Architecture (Library Split Complete)
 - [ ] Are core logic and CLI separated (no CLI-specific code in core)?
 - [ ] Are data models (PackageMetadata) independent of presentation?
 - [ ] Can core functionality be reused without the CLI?
 - [ ] Are dependencies minimal and well-managed?
+- [ ] Does the GUI properly use the Core library?
+- [ ] Are progress events properly implemented and used?
 
 ### Compatibility
 - [ ] Does the change maintain backward compatibility with existing archives?
@@ -103,13 +105,13 @@ Use this checklist when reviewing changes to Sims1Pkg. The focus is on correctne
 dotnet build
 
 # Test extraction with a valid archive
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj extract test.s1pk
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj extract test.s1pk
 
 # Test compression
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj compress source/ output.s1pk
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj compress source/ output.s1pk
 
 # Test help
-dotnet run --project src/Sims1Pkg/Sims1Pkg.csproj help
+dotnet run --project src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj help
 ```
 
 ### Error Cases
