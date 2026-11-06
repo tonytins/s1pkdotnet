@@ -94,11 +94,37 @@ public class TS1Package : ISPackage
     }
 
     /// <summary>
+    /// Extracts files from a package archive to the specified directory with options.
+    /// </summary>
+    /// <param name="packagePath">Path to the .s1pk file.</param>
+    /// <param name="outputDirectory">Directory to extract files to.</param>
+    /// <param name="flatExtraction">If true, extract files flat (no subdirectories).</param>
+    /// <param name="overwrite">If true, overwrite existing files without prompting.</param>
+    public void ExtractWithOptions(string packagePath, string? outputDirectory, bool flatExtraction = false, bool overwrite = false)
+    {
+        ExtractAsync(packagePath, outputDirectory, flatExtraction, overwrite).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Extracts files from a package archive asynchronously with options.
+    /// </summary>
+    /// <param name="packagePath">Path to the .s1pk file.</param>
+    /// <param name="outputDirectory">Directory to extract files to.</param>
+    /// <param name="flatExtraction">If true, extract files flat (no subdirectories).</param>
+    /// <param name="overwrite">If true, overwrite existing files without prompting.</param>
+    public async Task ExtractWithOptionsAsync(string packagePath, string? outputDirectory = null, bool flatExtraction = false, bool overwrite = false)
+    {
+        await ExtractAsync(packagePath, outputDirectory, flatExtraction, overwrite);
+    }
+
+    /// <summary>
     /// Extracts files from a package archive asynchronously.
     /// </summary>
     /// <param name="packagePath">Path to the .s1pk file.</param>
     /// <param name="outputDirectory">Directory to extract files to. Defaults to package directory.</param>
-    public async Task ExtractAsync(string packagePath, string? outputDirectory = null)
+    /// <param name="flatExtraction">If true, extract files flat (no subdirectories).</param>
+    /// <param name="overwrite">If true, overwrite existing files without prompting.</param>
+    public async Task ExtractAsync(string packagePath, string? outputDirectory = null, bool flatExtraction = false, bool overwrite = false)
     {
         if (!File.Exists(packagePath))
         {
@@ -148,19 +174,43 @@ public class TS1Package : ISPackage
         {
             if (IsSupportedFile(entry.FullName))
             {
-                string destinationPath = Path.Combine(extractPath, entry.FullName);
-                string? directory = Path.GetDirectoryName(destinationPath);
+                string destinationPath;
                 
-                if (!string.IsNullOrEmpty(directory))
+                if (flatExtraction)
                 {
-                    Directory.CreateDirectory(directory);
+                    // Flat extraction: use only the filename
+                    destinationPath = Path.Combine(extractPath, Path.GetFileName(entry.FullName));
+                }
+                else
+                {
+                    // Preserve directory structure
+                    destinationPath = Path.Combine(extractPath, entry.FullName);
+                    string? directory = Path.GetDirectoryName(destinationPath);
+                    
+                    if (!string.IsNullOrEmpty(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
                 }
                 
-                entry.ExtractToFile(destinationPath, overwrite: true);
+                // Skip metadata.xml when doing flat extraction (e.g., to Downloads)
+                if (flatExtraction && entry.FullName.Equals(MetadataFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    extractedCount++;
+                    continue;
+                }
+                
+                // Check if file exists and overwrite is false
+                if (File.Exists(destinationPath) && !overwrite)
+                {
+                    throw new IOException("File already exists and overwrite is disabled: " + destinationPath);
+                }
+                
+                entry.ExtractToFile(destinationPath, overwrite: overwrite);
                 extractedCount++;
                 
                 int percent = (int)((float)extractedCount / totalSupported * 100);
-                Progress?.Invoke(this, new PackageProgressEventArgs(percent, "Extracting files", entry.FullName));
+                Progress?.Invoke(this, new PackageProgressEventArgs(percent, "Extracting files", flatExtraction ? Path.GetFileName(entry.FullName) : entry.FullName));
             }
         }
 
@@ -272,6 +322,11 @@ public class TS1Package : ISPackage
                 foreach (var file in files)
                 {
                     string relativePath = Path.GetRelativePath(sourceDirectory, file);
+                    
+                    // Skip metadata.xml as it's already been added
+                    if (relativePath.Equals(MetadataFileName, StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    
                     zip.CreateEntryFromFile(file, relativePath, CompressionLevel.Optimal);
                     addedCount++;
                     
@@ -284,7 +339,12 @@ public class TS1Package : ISPackage
         }
     }
 
-    private static bool IsSupportedFile(string filePath)
+    /// <summary>
+    /// Checks if a file is a supported Sims 1 file type.
+    /// </summary>
+    /// <param name="filePath">The file path to check.</param>
+    /// <returns>True if the file is a supported type.</returns>
+    public static bool IsSupportedFile(string filePath)
     {
         foreach (var ext in SupportedExtensions)
         {

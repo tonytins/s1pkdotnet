@@ -18,6 +18,12 @@ public class PackageMetadata : ISMetadata
     [XmlElement("Date")]
     public string Date { get; set; } = string.Empty;
 
+    [XmlElement("License")]
+    public string License { get; set; } = string.Empty;
+
+    [XmlElement("SourceURL")]
+    public string SourceURL { get; set; } = string.Empty;
+
     // Optional fields for future expansion
     [XmlElement("Version")]
     public string? Version { get; set; }

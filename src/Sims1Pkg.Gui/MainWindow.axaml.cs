@@ -7,21 +7,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Sims1Pkg;
 
 namespace Sims1Pkg.Gui;
 
 public partial class MainWindow : Window
 {
-    private readonly TS1Package _packageService = new();
     private ProgressBar? _progressBar;
     private TextBlock? _statusText;
     private TextBlock? _readyText;
     private ListBox? _fileList;
-    private Button? _extractButton;
-    private Button? _compressButton;
-    private Button? _inspectButton;
+    private TextBlock? _gameDirText;
+    private Button? _refreshDirsButton;
 
     public MainWindow()
     {
@@ -32,28 +29,54 @@ public partial class MainWindow : Window
         _statusText = this.FindControl<TextBlock>("StatusText");
         _readyText = this.FindControl<TextBlock>("ReadyText");
         _fileList = this.FindControl<ListBox>("FileList");
-        _extractButton = this.FindControl<Button>("ExtractButton");
-        _compressButton = this.FindControl<Button>("CompressButton");
-        _inspectButton = this.FindControl<Button>("InspectButton");
+        _gameDirText = this.FindControl<TextBlock>("GameDirText");
+        _refreshDirsButton = this.FindControl<Button>("RefreshDirsButton");
         
         // Wire up event handlers
-        if (_extractButton != null) _extractButton.Click += OnExtractClick;
-        if (_compressButton != null) _compressButton.Click += OnCompressClick;
-        if (_inspectButton != null) _inspectButton.Click += OnInspectClick;
+        if (_refreshDirsButton != null) _refreshDirsButton.Click += OnRefreshDirsClick;
         
-        // Initialize
+        // Initialize GameDirectories display
+        RefreshGameDirectories();
+        
         UpdateStatus("Ready");
-        
-        // Add supported extensions to file dialog filters
-        _packageService.Progress += (sender, e) => 
-        {
-            SetProgress(e.PercentComplete, e.Message);
-        };
     }
 
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    private void RefreshGameDirectories()
+    {
+        string gameDir = GameDirectories.GameDirectory;
+        string downloadsDir = GameDirectories.DownloadsDirectory;
+        
+        // Validate game directory
+        bool isValid = false;
+        if (!string.IsNullOrEmpty(gameDir))
+        {
+            string simsExe = Path.Combine(gameDir, "Sims.exe");
+            isValid = File.Exists(simsExe);
+        }
+        
+        if (_gameDirText != null)
+        {
+            if (string.IsNullOrEmpty(gameDir))
+            {
+                _gameDirText.Text = "Game: Not detected - Set TS1_GAME_DIR or install The Sims 1";
+            }
+            else
+            {
+                _gameDirText.Text = "Game: " + gameDir + (isValid ? " (Valid)" : " (Warning: Sims.exe not found)");
+            }
+            
+            if (!string.IsNullOrEmpty(downloadsDir))
+            {
+                _gameDirText.Text += " | Downloads: " + downloadsDir;
+            }
+        }
+        
+        UpdateStatus("Game directories: " + (isValid ? "Valid" : "Not found"));
     }
 
     private void SetProgress(int percent, string message)
@@ -78,137 +101,11 @@ public partial class MainWindow : Window
             _fileList.ItemsSource = files;
     }
 
-    private async void OnExtractClick(object? sender, RoutedEventArgs e)
+    private void OnRefreshDirsClick(object? sender, RoutedEventArgs e)
     {
-        try
-        {
-            var dialog = new OpenFileDialog
-            {
-                Title = "Select Package File",
-                Filters = new List<FileDialogFilter>
-                {
-                    new FileDialogFilter { Name = "Sims1Pkg Files", Extensions = { "s1pk" } },
-                    new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
-                }
-            };
-            
-            var result = await dialog.ShowAsync(this);
-            if (result == null || result.Length == 0) return;
-            
-            string packagePath = result[0];
-            string outputDir = Path.Combine(
-                Path.GetDirectoryName(packagePath)!,
-                Path.GetFileNameWithoutExtension(packagePath));
-            
-            Directory.CreateDirectory(outputDir);
-            
-            UpdateStatus("Extracting...");
-            SetIndeterminate(true);
-            
-            await _packageService.ExtractAsync(packagePath, outputDir);
-            
-            UpdateStatus("Extraction complete!");
-            SetIndeterminate(false);
-            SetProgress(100, "Done");
-            
-            // Show extracted files
-            var files = Directory.GetFiles(outputDir, "*", SearchOption.AllDirectories)
-                .Select(f => Path.GetRelativePath(outputDir, f))
-                .ToList();
-            SetFileList(files);
-        }
-        catch (Exception ex)
-        {
-            UpdateStatus("Error: " + ex.Message);
-            SetIndeterminate(false);
-        }
-    }
-
-    private async void OnCompressClick(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var dialog = new OpenFolderDialog
-            {
-                Title = "Select Source Directory"
-            };
-            
-            var sourceDir = await dialog.ShowAsync(this);
-            if (string.IsNullOrEmpty(sourceDir)) return;
-            
-            var saveDialog = new SaveFileDialog
-            {
-                Title = "Save Package As",
-                Filters = new List<FileDialogFilter>
-                {
-                    new FileDialogFilter { Name = "Sims1Pkg Files", Extensions = { "s1pk" } }
-                },
-                InitialFileName = Path.GetFileName(sourceDir) + ".s1pk"
-            };
-            
-            var packagePath = await saveDialog.ShowAsync(this);
-            if (string.IsNullOrEmpty(packagePath)) return;
-            
-            UpdateStatus("Compressing...");
-            SetIndeterminate(true);
-            
-            await _packageService.CompressAsync(sourceDir, packagePath);
-            
-            UpdateStatus("Compression complete!");
-            SetIndeterminate(false);
-            SetProgress(100, "Done");
-        }
-        catch (Exception ex)
-        {
-            UpdateStatus("Error: " + ex.Message);
-            SetIndeterminate(false);
-        }
-    }
-
-    private async void OnInspectClick(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var dialog = new OpenFileDialog
-            {
-                Title = "Select Package File",
-                Filters = new List<FileDialogFilter>
-                {
-                    new FileDialogFilter { Name = "Sims1Pkg Files", Extensions = { "s1pk" } },
-                    new FileDialogFilter { Name = "All Files", Extensions = { "*" } }
-                }
-            };
-            
-            var result = await dialog.ShowAsync(this);
-            if (result == null || result.Length == 0) return;
-            
-            string packagePath = result[0];
-            
-            UpdateStatus("Inspecting package...");
-            SetIndeterminate(true);
-            
-            // For inspection, we extract to a temp directory and list files
-            string tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(tempDir);
-            
-            await _packageService.ExtractAsync(packagePath, tempDir);
-            
-            // Get files
-            var files = Directory.GetFiles(tempDir, "*", SearchOption.AllDirectories)
-                .Select(f => Path.GetRelativePath(tempDir, f))
-                .ToList();
-            
-            SetFileList(files);
-            
-            UpdateStatus("Package inspected");
-            SetIndeterminate(false);
-            SetProgress(100, "Done");
-        }
-        catch (Exception ex)
-        {
-            UpdateStatus("Error: " + ex.Message);
-            SetIndeterminate(false);
-        }
+        // Reset and rediscover
+        GameDirectories.Reset();
+        RefreshGameDirectories();
     }
 
     private void UpdateStatus(string message)
