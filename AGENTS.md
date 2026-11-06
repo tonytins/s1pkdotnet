@@ -165,22 +165,7 @@ Keep personal preferences and machine-specific guidance in git-ignored
 shared project instructions. Check for relevant local guidance before
 environment-specific work.
 
-## Future Roadmap
+## See Also
 
-### Short-term
-- [ ] Complete current refactoring (done)
-- [ ] Add more file type support as discovered
-- [ ] Improve error messages and validation
-
-### Medium-term
-- [ ] Split core functionality into `Sims1Pkg.Core` library
-- [ ] Create `Sims1Pkg.Gui` using Avalonia
-- [ ] Add unit tests for core library
-- [ ] Add schema validation for metadata.xml
-
-### Long-term
-- [ ] Support batch operations
-- [ ] Add package verification/validation mode
-- [ ] Support package signing
-- [ ] Create package browser/manager GUI
-- [ ] Add integration with Sims 1 game directory
+- [Roadmap](doc/roadmap.md) - Project milestones and future plans
+- [Documentation](doc/README.md) - Overview of project documentation

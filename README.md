@@ -4,6 +4,8 @@ Sims1Pkg is a format for making compressing and extracting Sims 1 content easier
 
 It provides a clean command-line interface for working with Sims 1 game files, bringing modern package management to classic Sims games.
 
+**Documentation**: See [doc/](doc/) for roadmap and design notes.
+
 ## Features
 
 - **Extract**: Unpack `.s1pk` archives to a directory
