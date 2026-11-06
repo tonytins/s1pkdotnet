@@ -189,7 +189,8 @@ public class Program
         Console.WriteLine("  --description Package description");
         Console.WriteLine();
         Console.WriteLine("Notes:");
-        Console.WriteLine("  - Archives must contain both 'metadata.json' and at least one '.ts1' file");
-        Console.WriteLine("  - Supported file types: .iff, .ts1");
+        Console.WriteLine("  - Archives must contain 'metadata.xml' file");
+        Console.WriteLine("  - Supported file types: .iff, .far, .cmx, .skn, .bmp, .hdb, .house, .family, .sims, .HIT, .hot, .hsm, .XA, .cht, .tds, .pal, .dat");
+        Console.WriteLine("  - Format inspired by Sims2Pack");
     }
 }

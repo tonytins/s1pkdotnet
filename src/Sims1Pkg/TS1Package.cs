@@ -1,14 +1,51 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Text.Json;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Sims1Pkg;
 
 public class TS1Package : ISPackage
 {
-    private static readonly string[] SupportedExtensions = { ".iff", ".ts1" };
-    private const string MetadataFileName = "metadata.json";
+    /// <summary>
+    /// All supported Sims 1 file extensions for packaging.
+    /// Based on file types found in The Sims 1 GameData and Downloads directories.
+    /// Inspired by Sims2Pack's comprehensive format support.
+    /// </summary>
+    private static readonly string[] SupportedExtensions = {
+        // Core resource formats
+        ".iff",    // IFF format - various resources
+        ".far",    // Fast Access Resource - resource archives
+        
+        // Custom content
+        ".cmx",    // Custom content - clothing, hair, objects
+        ".skn",    // Skin files
+        
+        // Images
+        ".bmp",    // Bitmap images
+        
+        // Game data
+        ".hdb",    // House database
+        ".house",  // House files
+        ".family", // Family files
+        ".sims",   // Sims files (alternative format)
+        ".cht",    // Character files
+        
+        // Audio
+        ".HIT",    // Sound files
+        ".hot",    // Sound files
+        ".hsm",    // Sound files
+        ".XA",     // Audio files (from expansions)
+        
+        // Textures and palettes
+        ".tds",    // Texture data
+        ".pal",    // Palette files
+        
+        // Data files
+        ".dat"     // Generic data files
+    };
+    private const string MetadataFileName = "metadata.xml";
 
     public PackageMetadata Metadata { get; private set; } = new();
 
@@ -39,20 +76,17 @@ public class TS1Package : ISPackage
         using var zip = ZipFile.OpenRead(packagePath);
 
         bool metadataFound = false;
-        bool ts1Found = false;
 
         foreach (var entry in zip.Entries)
         {
             if (entry.FullName.Equals(MetadataFileName, StringComparison.OrdinalIgnoreCase))
                 metadataFound = true;
-            if (entry.FullName.EndsWith(".ts1", StringComparison.OrdinalIgnoreCase))
-                ts1Found = true;
         }
 
-        if (!metadataFound || !ts1Found)
+        if (!metadataFound)
         {
             throw new InvalidDataException(
-                "Cannot extract files: archive must contain both 'metadata.json' and at least one '.ts1' file.");
+                "Cannot extract files: archive must contain 'metadata.xml' file.");
         }
 
         var metadataEntry = zip.GetEntry(MetadataFileName);
@@ -64,11 +98,8 @@ public class TS1Package : ISPackage
         using (var stream = metadataEntry.Open())
         using (var reader = new StreamReader(stream))
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            Metadata = JsonSerializer.Deserialize<PackageMetadata>(reader.ReadToEnd(), options) ?? new PackageMetadata();
+            string xml = reader.ReadToEnd();
+            Metadata = PackageMetadata.FromXml(xml) ?? new PackageMetadata();
             Console.WriteLine("Package metadata:");
             Console.WriteLine("  Name: " + Metadata.Name);
             Console.WriteLine("  Author: " + Metadata.Author);
@@ -117,28 +148,45 @@ public class TS1Package : ISPackage
             throw new DirectoryNotFoundException("Source directory not found: " + sourceDirectory);
         }
 
-        bool hasTs1Files = false;
+        // Check if there are any supported files to compress
+        bool hasFiles = false;
         foreach (var ext in SupportedExtensions)
         {
             if (Directory.GetFiles(sourceDirectory, "*" + ext, SearchOption.AllDirectories).Length > 0)
             {
-                if (ext.Equals(".ts1", StringComparison.OrdinalIgnoreCase))
-                    hasTs1Files = true;
+                hasFiles = true;
+                break;
             }
         }
 
-        if (!hasTs1Files)
+        if (!hasFiles)
         {
             throw new InvalidDataException(
-                "Cannot create package: at least one '.ts1' file is required in the source directory.");
+                "Cannot create package: no supported files found in the source directory. " +
+                "Supported extensions: " + string.Join(", ", SupportedExtensions));
         }
 
-        var packageMetadata = metadata ?? new PackageMetadata
+        // Try to load existing metadata.xml from source if no metadata provided
+        var packageMetadata = metadata;
+        if (packageMetadata == null)
         {
-            Name = Path.GetFileNameWithoutExtension(packagePath),
-            Author = Environment.UserName,
-            Date = DateTime.Now.ToString("yyyy-MM-dd")
-        };
+            string metadataPath = Path.Combine(sourceDirectory, MetadataFileName);
+            if (File.Exists(metadataPath))
+            {
+                using (var reader = new StreamReader(metadataPath))
+                {
+                    packageMetadata = PackageMetadata.FromXml(reader.ReadToEnd());
+                }
+            }
+            
+            // Fallback to default metadata
+            packageMetadata ??= new PackageMetadata
+            {
+                Name = Path.GetFileNameWithoutExtension(packagePath),
+                Author = Environment.UserName,
+                Date = DateTime.Now.ToString("yyyy-MM-dd")
+            };
+        }
 
         string outputDir = Path.GetDirectoryName(packagePath) ?? Environment.CurrentDirectory;
         Directory.CreateDirectory(outputDir);
@@ -149,14 +197,9 @@ public class TS1Package : ISPackage
             using (var stream = metadataEntry.Open())
             using (var writer = new StreamWriter(stream))
             {
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                };
-                string json = JsonSerializer.Serialize(packageMetadata, options);
-                writer.Write(json);
+                writer.Write(packageMetadata.ToXml());
             }
-            Console.WriteLine("Added metadata.json");
+            Console.WriteLine("Added metadata.xml");
 
             int addedCount = 0;
             foreach (var ext in SupportedExtensions)
