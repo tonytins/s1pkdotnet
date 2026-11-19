@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Sims1Pkg</RootNamespace>
+    <Description>Reads, writes, and installs S1PK packages of Sims 1 custom content.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sims1Pkg.Core.Tests" />
+  </ItemGroup>
+
+</Project>

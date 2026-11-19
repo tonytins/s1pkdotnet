@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>Tony Bark</Authors>
+    <PackageLicenseExpression>Unlicense OR BSD-3-Clause</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

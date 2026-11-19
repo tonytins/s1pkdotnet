@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>s1pk</AssemblyName>
+    <RootNamespace>Sims1Pkg.Cli</RootNamespace>
+    <Description>Command-line tool for packing and installing S1PK packages.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sims1Pkg.Core\Sims1Pkg.Core.csproj" />
+  </ItemGroup>
+
+</Project>

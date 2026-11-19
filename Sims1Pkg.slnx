@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Sims1Pkg.Core/Sims1Pkg.Core.csproj" />
+    <Project Path="src/Sims1Pkg.Cli/Sims1Pkg.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Sims1Pkg.Core.Tests/Sims1Pkg.Core.Tests.csproj" />
+  </Folder>
+</Solution>

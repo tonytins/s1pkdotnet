@@ -1,0 +1,13 @@
+{
+    "diffEditor.codeLens": true,
+    "editor.tabCompletion": "on",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.jj": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.mdocfiles": true
+    }
+}

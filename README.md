@@ -1,0 +1,63 @@
+# Sims1Pkg
+
+Sims1Pkg (S1PK) is a one-file installer format for The Sims 1 custom content.
+
+The Sims 2 and 3 let players install downloads by opening a single `.sims2pack`
+or `.sims3pack` file. The Sims 1 never had that. Downloads arrive as loose zips,
+and players copy each file by hand into `Downloads`, `GameData/Skins`,
+`GameData/Walls`, and so on. An `.s1pk` file carries the content plus a manifest
+that says what each file is, so the installer can put it in the right place, and
+take it out again later.
+
+> **Status:** being rebuilt from scratch. The format model and command layout
+> exist, but `pack`, `inspect`, `install`, `uninstall`, and `list` aren't
+> implemented yet. See the [roadmap](doc/roadmap.md).
+
+## The format at a glance
+
+An `.s1pk` file is a standard ZIP archive with a `manifest.xml` at its root. The
+manifest lists every file, its kind, its size, and its SHA-256 hash. The kind
+decides where the file is installed:
+
+| Kind     | Typical files                   | Installed to      |
+| -------- | ------------------------------- | ----------------- |
+| `object` | `.iff`, `.far`                  | `Downloads`       |
+| `skin`   | `.cmx`, `.skn`, `.bmp`          | `GameData/Skins`  |
+| `wall`   | `.wll`                          | `GameData/Walls`  |
+| `floor`  | `.flr`                          | `GameData/Floors` |
+
+The folders are relative to the game folder of a Complete Collection CD install.
+Houses, Sims, and families aren't supported yet, since installing them means
+editing the neighborhood rather than copying files.
+
+## Building
+
+Sims1Pkg needs the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+
+```sh
+dotnet build
+dotnet test
+dotnet run --project src/Sims1Pkg.Cli -- help
+```
+
+## Project layout
+
+| Path                     | What it is                                            |
+| ------------------------ | ----------------------------------------------------- |
+| `src/Sims1Pkg.Core`      | Library that reads, writes, and installs packages     |
+| `src/Sims1Pkg.Cli`       | The `s1pk` command-line tool                          |
+| `tests/Sims1Pkg.Core.Tests` | xUnit tests for the library                        |
+| `doc/roadmap.md`         | What's done and what's next                           |
+
+## Contributing
+
+Read [AGENTS.md](AGENTS.md) for the project's conventions and
+[REVIEW.md](REVIEW.md) for what a change should be checked against. Facts about
+how The Sims 1 lays out its files are the easiest thing to get wrong here, so
+please mention the game version and install type you tested against.
+
+## License
+
+In jurisdictions that recognize copyright waivers, I've
+[waived all copyright](UNLICENSE) and related or neighboring rights to this
+project. Where these waivers aren't recognized, [BSD-3-Clause](COPYING) applies.
