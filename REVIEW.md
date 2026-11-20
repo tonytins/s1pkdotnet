@@ -14,7 +14,7 @@ Sims 1 content. The rules it checks against are in [AGENTS.md](AGENTS.md).
   the change addresses that context.
 - Check the available build and test results. Run `dotnet build` and `dotnet test` when
   the change or its verification warrants it. For changes to packing or installing, run
-  `s1pk` against a real package and a game folder. Report checks that couldn't be run,
+  them against a real package and a copy of a game folder, through the GUI or a scratch project. Report checks that couldn't be run,
   such as Windows from Linux.
 
 ## Review Checklist

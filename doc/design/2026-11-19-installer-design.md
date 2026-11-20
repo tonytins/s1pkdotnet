@@ -1,9 +1,9 @@
 # Sims1Pkg installer: design
 
-> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestones:** Kodama (format, CLI install) and Hikari (GUI)
+> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestone:** Kodama · **Amended:** 2026-11-19, GUI only, with packing in the GUI
 
 Sims1Pkg (S1PK) is a one-file installer for The Sims 1 custom content. This document says what the installer does,
-why, and how it gets built, so the plan for Kodama and Hikari can be made from it.
+why, and how it gets built, so the plan for Kodama can be made from it.
 
 ## Why
 
@@ -25,8 +25,8 @@ Roundhouse for the window structure and how to build an Avalonia title bar on ev
 2. See every installed package and uninstall any of them, leaving the game folder as it was before.
 3. Never leave the game broken: check everything before writing, never write outside the game folder, and never
    leave a half-finished install.
-4. Make packages from a folder of content with `s1pk pack`.
-5. Run on Windows, Linux, and macOS, with the CLI and the GUI doing the same thing through one library.
+4. Make packages from a folder of content, in the same window.
+5. Run on Windows, Linux, and macOS.
 6. Show interface text from `.cst` tables, so the app can be translated.
 
 ## Non-goals
@@ -37,6 +37,8 @@ Roundhouse for the window structure and how to build an Avalonia title bar on ev
 - Installing several packages at once.
 - A dark look. The TS1 look is already dark navy.
 - Downloading packages from anywhere.
+- A command-line tool. Sims1Pkg is a GUI app; a command-line tool, if one is ever wanted, belongs in Swift, outside
+  this project.
 
 ## Anti-goals
 
@@ -50,7 +52,8 @@ The installer fails, even if it works, if:
 
 ## Constraints
 
-- **Layers.** `Sims1Pkg.Core` holds all package and install logic and has no UI. The CLI and the GUI only call it.
+- **Layers.** `Sims1Pkg.Core` holds all package and install logic and has no UI. The GUI only calls it, so other
+  programs can use Core too.
 - **Dependencies:** Avalonia 12.1.5 (`Avalonia`, `Avalonia.Desktop`, `Avalonia.Themes.Fluent`), the same version as
   Roundhouse, for the GUI only, and CST.NET 2.1.200 (`CSTNet`) for interface text. Comic Neue is bundled as a font
   asset under the SIL Open Font License. GitInfo 3.6.1 sets the version, as in the author's other projects: a base in
@@ -68,7 +71,8 @@ The installer fails, even if it works, if:
 
 ## Approaches
 
-The format and install behavior were settled in conversation; the choice was how to build the GUI.
+The format and install behavior were settled in conversation; the choice was how to build the GUI. A command-line
+tool was planned at first and dropped: the GUI is the only front end, and packing moved into it.
 
 | Approach | What it trades | |
 |---|---|---|
@@ -88,28 +92,27 @@ Code-behind was chosen because it's the smallest thing that works, and it matche
 - It holds the package's name, author, and date (required), and its id, version, description, license, and source
   URL (optional), plus one entry per content file: its path in the archive, its kind, its size, and its SHA-256.
 - The **id** names the package across versions, so the installer can tell an update from a different package. The
-  author sets it once and keeps it for every version. Without one, the id is the name and author together. `s1pk
-  pack` takes `--id`, and a package's id is shown by `inspect` and in the GUI.
-- Kinds in format 1: `object`, `skin`, `wall`, `floor`. A file with an unknown kind is listed by `inspect` and the GUI,
+  author sets it once and keeps it for every version. Without one, the id is the name and author together. The
+  packing form asks for it, and the GUI shows it.
+- Kinds in format 1: `object`, `skin`, `wall`, `floor`. A file with an unknown kind is listed by the GUI,
   marked as unknown, and blocks installing the package.
 - Unknown optional elements in the manifest are ignored.
 
 ### Packing
 
-- `s1pk pack <folder> <package.s1pk>` takes each file's kind from where it sits in the source folder, using the game's
+- Packing takes each file's kind from where it sits in the source folder, using the game's
   own folder names: `Downloads/` gives `object`, `GameData/Skins/` gives `skin`, `GameData/Walls/` gives `wall`, and
   `GameData/Floors/` gives `floor`, matched without regard to case.
 - Files outside those folders fall back to their extension: `.iff` and `.far` give `object`, `.wll` gives `wall`,
   `.flr` gives `floor`, and `.cmx`, `.skn`, `.bcf`, `.bmf`, and `.cfp` give `skin`.
-- A file neither rule places, such as a loose `.bmp`, stops packing with a message naming the file and the folders
-  that would place it.
+- A file neither rule places, such as a loose `.bmp`, can't be packed. The form marks it, says which folders would
+  place it, and keeps *Save package…* disabled until every file is placed.
 
 ### Finding the game
 
 - In order: `TS1_GAME_DIR`; on Windows, `C:\Program Files (x86)\Maxis\The Sims Complete Collection`; then the folder
   the player chose last time.
-- If none is a game folder, the GUI asks the player to pick one once and remembers it. The CLI takes `--game <folder>`
-  and otherwise stops with a message naming `TS1_GAME_DIR`.
+- If none is a game folder, the GUI asks the player to pick one once and remembers it.
 - The game shown at the bottom of the sidebar can be clicked to choose another.
 
 ### Installing
@@ -119,16 +122,15 @@ Code-behind was chosen because it's the smallest thing that works, and it matche
 - Objects go in `Downloads/<id>/`, matching the one-folder-per-object layout already in the game. Skins, walls,
   and floors go straight into their `GameData` folder, where the game reads them.
 - **Clashes** with files already in the game get one popup listing all of them, with *Cancel* and *Replace*. On
-  *Replace*, the current copies are moved into the package's receipt folder as backups. The CLI asks the same
-  question in the terminal, and takes `--replace` to answer yes without asking.
+  *Replace*, the current copies are moved into the package's receipt folder as backups.
 - **Updates:** a package whose id is already installed is an update. The popup says "Update Retro Diner Set from 1.2
   to 1.3?" Accepting removes the old version's files as an uninstall would, then installs the new one, as one
   operation: if any step fails, the old version is left installed as it was. Backups the old version made carry over
   to the new receipt, so uninstalling the new version still puts the player's original files back. Installing the
   same version again is offered as a reinstall, in the same way.
 - **Windows permissions:** when the game folder isn't writable, as under `Program Files`, the GUI asks for
-  administrator rights with Windows' usual prompt and installs with them. The CLI stops with a message to run it from
-  an administrator terminal. Sims1Pkg doesn't write to Windows' `VirtualStore` folder.
+  administrator rights with Windows' usual prompt and installs with them. Sims1Pkg doesn't write to Windows'
+  `VirtualStore` folder.
 - Progress shows in the main area, ending on a short summary of what went where.
 - A failure or cancel partway through puts back what was already written, including any backups, so the game folder
   ends as it began.
@@ -164,13 +166,17 @@ One window: a VentureOS structure in a HomeCrafter paint job.
   maximize, and close buttons on the right. Where Roundhouse falls back to the window manager's title bar (tiling
   window managers, WSL, no `XDG_CURRENT_DESKTOP`), so does Sims1Pkg.
 - **Sidebar:** a blue gradient with a white pill for the selected item. It lists the opened package (when there is
-  one), *Installed (n)*, and *Open package…*, with the game folder at the bottom.
+  one), *Installed (n)*, *Open package…*, and *New package…*, with the game folder at the bottom.
 - **Main area:** darker navy, with white-framed group boxes whose labels are cut into the frame, like RoofEdit's. Pale,
   bevelled buttons with navy text.
 - **Text:** Comic Neue throughout.
 - **Opening a package** by double-clicking it, or as the app's first argument, starts the app with that package
   selected. *Open package…* opens a file picker filtered to `.s1pk`.
 - **Installed** lists each package; selecting one shows its files, where they went, and an *Uninstall* button.
+- **New package…** asks for a folder, then shows a form beside a *Contents* frame. The form has the name, author,
+  and date (today by default), and the id, version, description, license, and source URL. The frame lists each
+  file with its kind and where it will install, and marks any file packing can't place. *Save package…* opens a
+  save picker for the `.s1pk`. The form remembers nothing between packages.
 - **Resizing:** the window resizes and maximizes; macOS shows all three traffic lights.
 
 ### Interface text

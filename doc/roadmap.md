@@ -1,28 +1,27 @@
 # Roadmap
 
 Milestones are named after Shinkansen services, from the all-stops train to the
-fastest.
+fastest. The [installer design](design/2026-11-19-installer-design.md) describes
+Kodama in full.
 
-## Kodama: command-line installer
+## Kodama: the installer app
 
-The first usable release. Pack custom content into an `.s1pk`, then install and
-uninstall it from the command line on a Complete Collection install.
+The first usable release: one Avalonia window that installs, manages, and makes
+`.s1pk` packages on a Complete Collection install.
 
-- [x] Scaffolding: solution layout, format model, game layout, CLI commands
-- [ ] Package format: read and write `manifest.xml`, validate it, `pack` and `inspect`.
-      `pack` takes each file's kind from the source folder's layout (`Downloads/`,
-      `GameData/Skins/`, and so on) and falls back to its extension.
-- [ ] Install: find the game, route files by kind, check conflicts, write a receipt in
-      the game folder, `install`, `uninstall`, and `list`
+- [x] Scaffolding: solution layout, format model, game layout
+- [ ] Package format: the manifest with format version and package id, reading and
+      verifying packages, and packing a folder by its layout with an extension fallback
+- [ ] Install: find the game, route files by kind, back up clashes, update in place,
+      keep receipts in the game folder, uninstall, and list
+- [ ] The app: a TS1-styled window with a Roundhouse-style title bar, interface text
+      in `.cst` tables read with [CST.NET](https://github.com/tonytins/cstdotnet),
+      install, manage, and pack
+
+## Hikari: getting it to players
+
 - [ ] Format specification in `doc/spec.md`
-
-## Hikari: graphical installer
-
-Open an `.s1pk` from a file manager, preview it, and install it with one click.
-
-- [ ] Avalonia app that previews and installs a package, designed from scratch
-- [ ] Interface text in `.cst` tables, read with [CST.NET](https://github.com/tonytins/cstdotnet)
-- [ ] File association for `.s1pk`
+- [ ] Open `.s1pk` files from the file manager on Linux and Windows
 
 ## Nozomi: beyond copying files
 

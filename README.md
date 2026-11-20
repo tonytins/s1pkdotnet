@@ -9,9 +9,9 @@ and players copy each file by hand into `Downloads`, `GameData/Skins`,
 that says what each file is, so the installer can put it in the right place, and
 take it out again later.
 
-> **Status:** being rebuilt from scratch. The format model and command layout
-> exist, but `pack`, `inspect`, `install`, `uninstall`, and `list` aren't
-> implemented yet. See the [roadmap](doc/roadmap.md).
+> **Status:** being rebuilt from scratch. The format model exists, but packing,
+> installing, and the app itself aren't built yet. See the
+> [roadmap](doc/roadmap.md) and the [design](doc/design/2026-11-19-installer-design.md).
 
 ## The format at a glance
 
@@ -37,7 +37,6 @@ Sims1Pkg needs the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```sh
 dotnet build
 dotnet test
-dotnet run --project src/Sims1Pkg.Cli -- help
 ```
 
 ## Project layout
@@ -45,9 +44,9 @@ dotnet run --project src/Sims1Pkg.Cli -- help
 | Path                     | What it is                                            |
 | ------------------------ | ----------------------------------------------------- |
 | `src/Sims1Pkg.Core`      | Library that reads, writes, and installs packages     |
-| `src/Sims1Pkg.Cli`       | The `s1pk` command-line tool                          |
 | `tests/Sims1Pkg.Core.Tests` | xUnit tests for the library                        |
 | `doc/roadmap.md`         | What's done and what's next                           |
+| `doc/design/`            | Approved designs                                      |
 
 ## Contributing
 

@@ -10,11 +10,11 @@ later.
 
 - **`Sims1Pkg.Core`** is the library. It owns the format (`PackageFormat`,
   `PackageManifest`, `PackageFile`, `ContentKind`) and the game's folder layout
-  (`GameInstall`). It must stay free of `Console`, dialogs, and other UI, so the CLI, the
-  GUI, and other programs can all use it. It reports results through return values and
+  (`GameInstall`). It must stay free of `Console`, dialogs, and other UI, so the GUI and other
+  programs can both use it. It reports results through return values and
   exceptions.
-- **`Sims1Pkg.Cli`** is the `s1pk` command-line tool. It parses arguments, calls Core,
-  and prints results.
+- **The GUI** (`Sims1Pkg.Gui`, coming in Kodama) is the only front end: an Avalonia app that installs, manages, and
+  makes packages. Sims1Pkg has no command-line tool, and won't get one in .NET.
 - **`Sims1Pkg.Core.Tests`** covers Core with xUnit v3.
 
 [doc/roadmap.md](doc/roadmap.md) lists the named milestones. Never commit build output
@@ -25,7 +25,6 @@ later.
 ```sh
 dotnet build   # warnings are errors
 dotnet test    # all tests must pass
-dotnet run --project src/Sims1Pkg.Cli -- help
 ```
 
 - Everything targets .NET 10, set in [Directory.Build.props](Directory.Build.props).
@@ -33,8 +32,9 @@ dotnet run --project src/Sims1Pkg.Cli -- help
   [GitInfo.txt](GitInfo.txt) plus every commit since it changed, loosely following the .NET SDK's
   `major.minor.patch`. The hundreds digit of the patch is the feature band. Start a new band for a new feature; a
   new major or minor version needs the owner's word.
-- Run the `s1pk` tool when a change affects what it does. Passing tests alone don't show
-  that a package installs.
+- Passing tests alone don't show that a package installs. Until the GUI exists, also call Core from a small scratch
+  project outside the repository against a real package. Once it does, run the app, and take screenshots on Xvfb
+  as the visual checks rule describes.
 - Report what you could not run locally, such as Windows from Linux.
 
 ## C# and S1PK
