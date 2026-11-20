@@ -27,6 +27,8 @@ decides where the file is installed:
 | `floor`  | `.flr`                          | `GameData/Floors` |
 
 The folders are relative to the game folder of a Complete Collection CD install.
+The [format specification](doc/spec.md) has the details, for anyone writing
+their own tools.
 Houses, Sims, and families aren't supported yet, since installing them means
 editing the neighborhood rather than copying files.
 

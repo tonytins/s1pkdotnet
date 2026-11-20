@@ -112,9 +112,8 @@ that leaves stray files is worse than one that refuses to start.
   only when older readers can't safely read the new data.
 - **Prefer additions an older reader can safely ignore**, and say what an older reader
   does with each one.
-- **Change the docs along with the format.** Until `doc/spec.md` is written, the manifest's
-  rules live in the [installer design](doc/design/2026-11-19-installer-design.md) and the XML
-  comments on `ManifestXml`.
+- **Change [the spec](doc/spec.md) along with the format.** It defines format version 1 as
+  built, for other tools' authors, and its version history lists every format version.
 
 ### Reference Material and Licensing
 

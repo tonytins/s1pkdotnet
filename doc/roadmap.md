@@ -20,7 +20,7 @@ The first usable release: one Avalonia window that installs, manages, and makes
 
 ## Hikari: getting it to players
 
-- [ ] Format specification in `doc/spec.md`
+- [x] Format specification in [`doc/spec.md`](spec.md)
 - [ ] Open `.s1pk` files from the file manager on Linux and Windows
 
 ## Nozomi: beyond copying files
