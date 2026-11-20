@@ -25,9 +25,9 @@ later.
 - **`Sims1Pkg.Gui.Tests`** covers the app's plain classes and its text.
 - **`Sims1Pkg.Core.Tests`** covers Core with xUnit v3.
 
-[doc/roadmap.md](doc/roadmap.md) lists the named milestones, and [changelog.md](changelog.md) records each
-release. [packaging/](packaging/README.md) builds the downloadable packages, adapted from Roundhouse's, into
-`dist/`. Never commit build output (`bin/`, `obj/`, `dist/`, `*.nupkg`).
+[doc/roadmap.md](doc/roadmap.md) lists the releases and their feature bands, and [changelog.md](changelog.md)
+records each release. [packaging/](packaging/README.md) builds the downloadable packages, adapted from Roundhouse's,
+into `dist/`. Never commit build output (`bin/`, `obj/`, `dist/`, `*.nupkg`).
 
 ## Build and Test
 
@@ -132,7 +132,7 @@ Describe only what works today.
 - [README.md](README.md) when features, prerequisites, or setup change.
 - [changelog.md](changelog.md) with changes players would notice, under the release they'll ship in.
 - [packaging/README.md](packaging/README.md) when the packages or what goes in them change.
-- [doc/roadmap.md](doc/roadmap.md) when a milestone item lands or the plan changes.
+- [doc/roadmap.md](doc/roadmap.md) when a band's item lands or the plan changes.
 - This file when the layout or rules change.
 
 State breaking changes, dependency bumps, and anything you couldn't verify in the summary

@@ -1,6 +1,6 @@
 # Sims1Pkg installer: design
 
-> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestone:** Kodama · **Amended:** 2026-11-19, GUI only, with packing in the GUI
+> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestone:** Kodama (0.1.1xx) · **Amended:** 2026-11-19, GUI only, with packing in the GUI
 
 Sims1Pkg (S1PK) is a one-file installer for The Sims 1 custom content. This document says what the installer does,
 why, and how it gets built, so the plan for Kodama can be made from it.
@@ -31,7 +31,7 @@ Roundhouse for the window structure and how to build an Avalonia title bar on ev
 
 ## Non-goals
 
-- Houses, Sims, and families. Installing them means editing the neighborhood, not copying files. They're in Nozomi.
+- Houses, Sims, and families. Installing them means editing the neighborhood, not copying files. They're in the roadmap's Ideas.
 - The Legacy Collection's folder layout. The target is the Complete Collection from CD.
 - Reading `.iff` files to work out what they are.
 - Installing several packages at once.

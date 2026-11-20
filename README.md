@@ -9,8 +9,8 @@ and players copy each file by hand into `Downloads`, `GameData/Skins`,
 that says what each file is, so the installer can put it in the right place, and
 take it out again later.
 
-> **Status:** the first release, Kodama, is feature-complete but not yet
-> released. See the [roadmap](doc/roadmap.md) and the
+> **Status:** the first release, 0.1 (Kodama), is in development. Its first
+> band, the installer app, is done. See the [roadmap](doc/roadmap.md) and the
 > [design](doc/design/2026-11-19-installer-design.md).
 
 ## The format at a glance
