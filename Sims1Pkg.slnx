@@ -5,5 +5,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Sims1Pkg.Core.Tests/Sims1Pkg.Core.Tests.csproj" />
+    <Project Path="tests/Sims1Pkg.Gui.Tests/Sims1Pkg.Gui.Tests.csproj" />
   </Folder>
 </Solution>

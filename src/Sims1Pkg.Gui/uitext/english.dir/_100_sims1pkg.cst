@@ -1,0 +1,5 @@
+// Sims1Pkg's interface text, in English. Other languages lay their own
+// _100_sims1pkg.cst over this one, in uitext/<language>.dir, and any value
+// they leave out or leave empty falls back to this table.
+
+app title ^Sims1Pkg^
