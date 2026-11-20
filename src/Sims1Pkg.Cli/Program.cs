@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Sims1Pkg.Cli;
 
 internal static class Program
@@ -47,10 +45,9 @@ internal static class Program
 
     private static int PrintVersion()
     {
-        string version = typeof(Program).Assembly
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-            ?? "unknown";
-        Console.WriteLine($"s1pk {version} (format {PackageFormat.CurrentVersion})");
+        Console.WriteLine(
+            $"s1pk {ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch} " +
+            $"(format {PackageFormat.CurrentVersion})");
         return Success;
     }
 

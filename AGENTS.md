@@ -29,6 +29,10 @@ dotnet run --project src/Sims1Pkg.Cli -- help
 ```
 
 - Everything targets .NET 10, set in [Directory.Build.props](Directory.Build.props).
+- The version comes from [GitInfo](https://github.com/devlooped/GitInfo): the base in
+  [GitInfo.txt](GitInfo.txt) plus every commit since it changed, loosely following the .NET SDK's
+  `major.minor.patch`. The hundreds digit of the patch is the feature band. Start a new band for a new feature; a
+  new major or minor version needs the owner's word.
 - Run the `s1pk` tool when a change affects what it does. Passing tests alone don't show
   that a package installs.
 - Report what you could not run locally, such as Windows from Linux.

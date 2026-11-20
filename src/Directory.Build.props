@@ -1,0 +1,21 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <!--
+      The version comes from GitInfo.txt at the repository root, plus every commit since it changed. Left to itself,
+      GitInfo would take the version from the latest tag or a branch named like a version instead.
+    -->
+    <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
+    <GitIgnoreBranchVersion>true</GitIgnoreBranchVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="3.6.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
