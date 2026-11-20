@@ -1,5 +1,111 @@
 // Sims1Pkg's interface text, in English. Other languages lay their own
 // _100_sims1pkg.cst over this one, in uitext/<language>.dir, and any value
-// they leave out or leave empty falls back to this table.
+// they leave out or leave empty falls back to this table. %s and %d are
+// filled in by the app.
 
+// The window
 app title ^Sims1Pkg^
+window minimize ^Minimize^
+window maximize ^Maximize^
+window restore ^Restore^
+window close ^Close^
+
+// The sidebar
+sidebar installed ^Installed (%d)^
+sidebar open ^Open package…^
+sidebar new ^New package…^
+sidebar game label ^Installing into:^
+sidebar no game ^Choose the game folder…^
+
+// A package before installing
+package author ^by %s^
+package version ^version %s^
+package id ^id %s^
+package unknown kinds ^This package has files this version of Sims1Pkg doesn't know how to install. A newer Sims1Pkg may be able to install it.^
+frame contents ^Contents^
+column file ^File^
+column kind ^Kind^
+column destination ^Goes to^
+kind object ^Object^
+kind skin ^Skin^
+kind wall ^Wall^
+kind floor ^Floor^
+kind unknown ^Unknown (%s)^
+destination unknown ^Can't be installed^
+button install ^Install^
+button update ^Update^
+button reinstall ^Reinstall^
+button cancel ^Cancel^
+
+// Installing
+installing ^Installing %s…^
+summary installed ^%s is installed.^
+summary hint ^Start The Sims to see it. Uninstall it from Installed at any time.^
+button done ^Done^
+
+// Installed packages
+installed title ^Installed packages^
+installed empty ^Nothing is installed yet. Open a package to install it.^
+installed problems ^Some install records couldn't be read:^
+installed on ^Installed %s^
+installed replaced ^Replaced a file that's put back on uninstall^
+button uninstall ^Uninstall^
+uninstalled ^%s is uninstalled.^
+
+// Making a package
+pack title ^New package^
+pack intro ^Choose the folder that holds the content. Files in Downloads, GameData/Skins, GameData/Walls, or GameData/Floors folders go there in the game. Other files are placed by their type.^
+pack choose folder ^Choose folder…^
+pack folder ^Folder: %s^
+pack empty ^There's nothing to pack in this folder.^
+pack left out ^Left out: %s^
+frame details ^Details^
+field name ^Name^
+field author ^Author^
+field date ^Date (YYYY-MM-DD)^
+field id ^Id (optional, keep it the same for every version)^
+field version ^Version^
+field description ^Description^
+field license ^License^
+field source url ^Web page^
+problem name missing ^Give the package a name.^
+problem author missing ^Say who made it.^
+problem date ^Write the date as YYYY-MM-DD.^
+problem id not valid ^An id uses letters, numbers, dots, dashes, and underscores, up to 64.^
+problem source url ^The web page must start with http:// or https://.^
+problem no kind ^Can't tell what this is^
+problem path not valid ^Name Windows doesn't allow^
+problem name clash ^Clashes with another file^
+button save package ^Save package…^
+pack saved ^Saved %s.^
+
+// Popups
+clash title ^Some files are already in your game^
+clash message ^%s wants to replace these files. Your copies will be kept, so uninstalling puts them back.^
+button replace ^Replace^
+update title ^Update %s?^
+update message ^Version %s is installed. Install version %s in its place?^
+no version ^(none)^
+reinstall title ^Install %s again?^
+reinstall message ^This version is already installed. Install it again?^
+uninstall title ^Uninstall %s?^
+uninstall message ^This removes everything it installed and puts back any files it replaced.^
+uninstall changed ^These files were changed since they were installed, and will be removed too:^
+uninstall missing ^These files are already gone:^
+game title ^Where is The Sims?^
+game message ^Choose the folder The Sims is installed in. It holds the GameData and UserData folders.^
+game not a game ^That folder doesn't look like The Sims. It should hold GameData and UserData folders.^
+no game ^Choose the game folder first.^
+admin title ^Administrator rights needed^
+admin message ^The game is in a folder Windows protects. Sims1Pkg will ask for administrator rights to install into it.^
+button continue ^Continue^
+not writable ^Sims1Pkg can't write to %s. Check that you're allowed to change files there.^
+error title ^Something went wrong^
+open failed ^%s couldn't be opened.^
+button ok ^OK^
+
+// File pickers
+picker packages ^Sims1Pkg packages^
+picker open title ^Open package^
+picker save title ^Save package^
+picker folder title ^Choose a folder^

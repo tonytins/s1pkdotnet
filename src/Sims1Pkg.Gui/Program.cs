@@ -22,9 +22,20 @@ public static class Program
     /// <summary>
     /// Sims1Pkg's Avalonia app.
     /// </summary>
-    public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<App>()
+    /// <remarks>
+    /// On X11, Avalonia leaves the window manager to draw the title bar unless it's asked to draw the frame itself,
+    /// which the navy bar needs to be the title bar, as Roundhouse and Passenger ask. The option is marked experimental
+    /// in Avalonia 12, so it's on only where <see cref="TitleBars.Merges()"/> would merge the bar.
+    /// </remarks>
+    public static AppBuilder BuildAvaloniaApp()
+    {
+#pragma warning disable AVALONIA_X11_CSD // Experimental; Roundhouse draws its merged title bar on X11 the same way.
+        var x11 = new X11PlatformOptions { EnableDrawnDecorations = TitleBars.Merges() };
+#pragma warning restore AVALONIA_X11_CSD
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .With(x11)
             .With(new FontManagerOptions { DefaultFamilyName = FontFamilyName })
             .LogToTrace();
+    }
 }

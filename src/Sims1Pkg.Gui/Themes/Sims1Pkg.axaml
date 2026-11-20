@@ -1,0 +1,211 @@
+<!--
+  Sims1Pkg's look: the navy of the Maxis-era tools (HomeCrafter's bevelled panels, the white-framed group boxes of
+  SimPaintShop and RoofEdit) on VentureOS's window structure. Colours were matched to the screenshots in
+  stash.local/screenshots and the approved mockup.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <SolidColorBrush x:Key="WindowBrush" Color="#0E2A6B"/>
+    <SolidColorBrush x:Key="MainBrush" Color="#13357F"/>
+    <SolidColorBrush x:Key="InkBrush" Color="#0E2A6B"/>
+    <SolidColorBrush x:Key="RowBrush" Color="#12FFFFFF"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#FFD54F"/>
+    <SolidColorBrush x:Key="SelectionBrush" Color="#0A64D8"/>
+
+    <!-- Plain white entry boxes, as the Maxis-era tools had, in every state. These replace Fluent's own brushes. -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="White"/>
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="White"/>
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="White"/>
+    <SolidColorBrush x:Key="TextControlForeground" Color="Black"/>
+    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="Black"/>
+    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="Black"/>
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="#6F93DD"/>
+    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="White"/>
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FFD54F"/>
+    <LinearGradientBrush x:Key="TitleBarBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#3B63B8" Offset="0"/>
+      <GradientStop Color="#1D3F8F" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="SidebarBrush" StartPoint="0%,0%" EndPoint="100%,0%">
+      <GradientStop Color="#1B3D8C" Offset="0"/>
+      <GradientStop Color="#2A54AD" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#F6F6F6" Offset="0"/>
+      <GradientStop Color="#CFD8EA" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonHoverBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#FFFFFF" Offset="0"/>
+      <GradientStop Color="#DDE5F4" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonPressedBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#C3CDE2" Offset="0"/>
+      <GradientStop Color="#EEF1F7" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Every button: pale and bevelled, white on its top and left edges and shadowed on the others. -->
+    <ControlTheme x:Key="{x:Type Button}" TargetType="Button">
+      <Setter Property="Background" Value="{StaticResource ButtonBrush}"/>
+      <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Padding" Value="14,5"/>
+      <Setter Property="MinWidth" Value="84"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border x:Name="Shadow" BorderBrush="#4F5F8C" BorderThickness="0,0,2,2" CornerRadius="3">
+            <Border x:Name="Light" Background="{TemplateBinding Background}" BorderBrush="White"
+                    BorderThickness="2,2,0,0" CornerRadius="3">
+              <ContentPresenter x:Name="PART_ContentPresenter" Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Padding="{TemplateBinding Padding}"
+                                Foreground="{TemplateBinding Foreground}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover">
+        <Setter Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+      </Style>
+      <Style Selector="^:pressed">
+        <Setter Property="Background" Value="{StaticResource ButtonPressedBrush}"/>
+        <Style Selector="^ /template/ Border#Shadow">
+          <Setter Property="BorderThickness" Value="2,2,0,0"/>
+        </Style>
+        <Style Selector="^ /template/ Border#Light">
+          <Setter Property="BorderThickness" Value="0,0,2,2"/>
+        </Style>
+      </Style>
+      <Style Selector="^:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+      </Style>
+      <Style Selector="^:focus-visible /template/ Border#Shadow">
+        <Setter Property="BoxShadow" Value="0 0 0 2 #FFD54F"/>
+      </Style>
+    </ControlTheme>
+
+    <!-- The window buttons Sims1Pkg draws on Linux: flat on the bar, Windows-style, with a red close. -->
+    <ControlTheme x:Key="CaptionButton" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}">
+            <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:pointerover">
+        <Setter Property="Background" Value="#33FFFFFF"/>
+      </Style>
+      <Style Selector="^:pressed">
+        <Setter Property="Background" Value="#4DFFFFFF"/>
+      </Style>
+      <Style Selector="^.close:pointerover">
+        <Setter Property="Background" Value="#C42B1C"/>
+      </Style>
+      <Style Selector="^.close:pressed">
+        <Setter Property="Background" Value="#A32417"/>
+      </Style>
+    </ControlTheme>
+
+    <!-- A white frame with its label cut into the top edge, as RoofEdit's group boxes have. -->
+    <ControlTheme x:Key="GroupFrame" TargetType="HeaderedContentControl">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <Border BorderBrush="White" BorderThickness="2" Margin="0,8,0,0" Padding="8,14,8,8">
+              <ContentPresenter Content="{TemplateBinding Content}"/>
+            </Border>
+            <Border Background="{DynamicResource MainBrush}" HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Margin="10,0,0,0" Padding="5,0">
+              <ContentPresenter Content="{TemplateBinding Header}" FontWeight="Bold" FontSize="13"
+                                Foreground="White"/>
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
+  </Styles.Resources>
+
+  <!-- The sidebar: white text on the gradient, and a white pill for the selected item. -->
+  <Style Selector="ListBox.sidebar">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+  <Style Selector="ListBox.sidebar ListBoxItem">
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Padding" Value="10,6"/>
+    <Setter Property="Margin" Value="0,1"/>
+    <Setter Property="CornerRadius" Value="6"/>
+    <Setter Property="FontSize" Value="14"/>
+  </Style>
+  <Style Selector="ListBox.sidebar ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="#26FFFFFF"/>
+    <Setter Property="Foreground" Value="White"/>
+  </Style>
+  <Style Selector="ListBox.sidebar ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+  </Style>
+  <Style Selector="ListBox.sidebar ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}"/>
+  </Style>
+
+  <!-- A plain white list box, as the Maxis-era tools had. -->
+  <Style Selector="ListBox.list">
+    <Setter Property="Background" Value="White"/>
+    <Setter Property="BorderBrush" Value="#6F93DD"/>
+    <Setter Property="BorderThickness" Value="2"/>
+  </Style>
+  <Style Selector="ListBox.list ListBoxItem">
+    <Setter Property="Foreground" Value="Black"/>
+    <Setter Property="Padding" Value="6,3"/>
+  </Style>
+  <Style Selector="ListBox.list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource SelectionBrush}"/>
+    <Setter Property="Foreground" Value="White"/>
+  </Style>
+  <Style Selector="ListBox.list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource SelectionBrush}"/>
+    <Setter Property="Foreground" Value="White"/>
+  </Style>
+
+  <Style Selector="TextBlock.title">
+    <Setter Property="FontSize" Value="22"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector="TextBlock.meta">
+    <Setter Property="Opacity" Value="0.85"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="Margin" Value="0,6,0,2"/>
+  </Style>
+  <Style Selector="TextBlock.warning">
+    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"/>
+    <Setter Property="TextWrapping" Value="Wrap"/>
+  </Style>
+  <Style Selector="TextBox">
+    <Setter Property="CornerRadius" Value="2"/>
+    <Setter Property="CaretBrush" Value="Black"/>
+    <Setter Property="SelectionBrush" Value="{StaticResource SelectionBrush}"/>
+  </Style>
+  <Style Selector="ProgressBar">
+    <Setter Property="Foreground" Value="White"/>
+    <Setter Property="Background" Value="{StaticResource WindowBrush}"/>
+    <Setter Property="Height" Value="14"/>
+  </Style>
+</Styles>

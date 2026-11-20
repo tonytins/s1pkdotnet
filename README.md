@@ -9,9 +9,9 @@ and players copy each file by hand into `Downloads`, `GameData/Skins`,
 that says what each file is, so the installer can put it in the right place, and
 take it out again later.
 
-> **Status:** being rebuilt from scratch. The library can make, verify, install,
-> update, and uninstall packages, but the app itself isn't built yet. See the
-> [roadmap](doc/roadmap.md) and the [design](doc/design/2026-11-19-installer-design.md).
+> **Status:** the first release, Kodama, is feature-complete but not yet
+> released. See the [roadmap](doc/roadmap.md) and the
+> [design](doc/design/2026-11-19-installer-design.md).
 
 ## The format at a glance
 
@@ -30,6 +30,28 @@ The folders are relative to the game folder of a Complete Collection CD install.
 Houses, Sims, and families aren't supported yet, since installing them means
 editing the neighborhood rather than copying files.
 
+## Using the app
+
+Sims1Pkg is one window with a sidebar.
+
+- **Install a package:** open an `.s1pk` (pass it to the app, or use
+  *Open package…*), check where each file will go, and press *Install*. If a
+  file is already in your game, Sims1Pkg asks before replacing it and keeps your
+  copy, so uninstalling puts it back. Installing a newer version of an installed
+  package updates it in place.
+- **See and remove what's installed:** *Installed* lists every package with the
+  files it added. *Uninstall* removes exactly those files and restores anything
+  they replaced.
+- **Make a package:** *New package…* takes a folder of content. Put files in
+  `Downloads`, `GameData/Skins`, `GameData/Walls`, or `GameData/Floors` folders
+  to say where they go, or let Sims1Pkg place them by type. Fill in the details,
+  then *Save package…*.
+
+Sims1Pkg finds the game through the `TS1_GAME_DIR` environment variable, the
+folder you chose last time, or on Windows the Complete Collection's default
+folder. Otherwise it asks. Installs keep their records in an `S1PK` folder inside
+the game folder.
+
 ## Building
 
 Sims1Pkg needs the [.NET 10 SDK](https://dotnet.microsoft.com/download).
@@ -37,6 +59,7 @@ Sims1Pkg needs the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```sh
 dotnet build
 dotnet test
+dotnet run --project src/Sims1Pkg.Gui
 ```
 
 ## Project layout
@@ -44,7 +67,9 @@ dotnet test
 | Path                     | What it is                                            |
 | ------------------------ | ----------------------------------------------------- |
 | `src/Sims1Pkg.Core`      | Library that reads, writes, and installs packages     |
+| `src/Sims1Pkg.Gui`       | The Avalonia app                                      |
 | `tests/Sims1Pkg.Core.Tests` | xUnit tests for the library                        |
+| `tests/Sims1Pkg.Gui.Tests`  | xUnit tests for the app's logic and text           |
 | `doc/roadmap.md`         | What's done and what's next                           |
 | `doc/design/`            | Approved designs                                      |
 

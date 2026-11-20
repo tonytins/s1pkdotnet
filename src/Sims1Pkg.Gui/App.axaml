@@ -4,5 +4,6 @@
              RequestedThemeVariant="Light">
   <Application.Styles>
     <FluentTheme/>
+    <StyleInclude Source="/Themes/Sims1Pkg.axaml"/>
   </Application.Styles>
 </Application>

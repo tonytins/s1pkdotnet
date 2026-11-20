@@ -1,7 +1,185 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Sims1Pkg.Gui.MainWindow"
-        Title="Sims1Pkg"
-        Width="760" Height="520">
-  <TextBlock Text="Sims1Pkg" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        Width="900" Height="600" MinWidth="680" MinHeight="440"
+        Background="{StaticResource WindowBrush}" Foreground="White" FontSize="14">
+  <Window.Resources>
+    <!--
+      Where the bar is the title bar on Linux, Avalonia draws the window's frame so the window manager doesn't add its
+      own title bar above. The frame keeps its edges for resizing and draws nothing else: the bar holds the title and
+      the buttons. Adapted from Roundhouse.
+    -->
+    <ControlTheme x:Key="FrameOnly" TargetType="WindowDrawnDecorations">
+      <Setter Property="DefaultTitleBarHeight" Value="32"/>
+      <Setter Property="DefaultFrameThickness" Value="4"/>
+      <Setter Property="DefaultShadowThickness" Value="0"/>
+      <Setter Property="Template">
+        <WindowDrawnDecorationsTemplate>
+          <WindowDrawnDecorationsContent/>
+        </WindowDrawnDecorationsTemplate>
+      </Setter>
+    </ControlTheme>
+  </Window.Resources>
+
+  <DockPanel>
+    <!-- The navy title bar. Where the desktop allows, it's the window's own title bar. -->
+    <Border x:Name="TitleBar" DockPanel.Dock="Top" Height="32" Background="{StaticResource TitleBarBrush}"
+            DoubleTapped="OnTitleBarDoubleTapped">
+      <Panel>
+        <TextBlock x:Name="TitleText" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
+                   IsHitTestVisible="False"/>
+        <!-- Windows-style buttons, drawn where Sims1Pkg draws the frame, on Linux. -->
+        <StackPanel x:Name="WindowButtons" Orientation="Horizontal" HorizontalAlignment="Right" IsVisible="False">
+          <Button x:Name="MinimizeButton" Theme="{StaticResource CaptionButton}" Click="OnMinimizeClicked">
+            <Path Data="M0,5 L10,5" Stroke="White" StrokeThickness="1" Width="10" Height="10"/>
+          </Button>
+          <Button x:Name="MaximizeButton" Theme="{StaticResource CaptionButton}" Click="OnMaximizeClicked">
+            <Path Data="M0.5,0.5 L9.5,0.5 L9.5,9.5 L0.5,9.5 Z" Stroke="White" StrokeThickness="1" Width="10" Height="10"/>
+          </Button>
+          <Button x:Name="CloseButton" Theme="{StaticResource CaptionButton}" Classes="close" Click="OnCloseClicked">
+            <Path Data="M0,0 L10,10 M10,0 L0,10" Stroke="White" StrokeThickness="1" Width="10" Height="10"/>
+          </Button>
+        </StackPanel>
+      </Panel>
+    </Border>
+
+    <!-- The sidebar: what's open, what's installed, and the game it installs into. -->
+    <Border DockPanel.Dock="Left" Width="190" Background="{StaticResource SidebarBrush}" BorderBrush="#6F93DD"
+            BorderThickness="0,0,2,0" Padding="8">
+      <DockPanel>
+        <Button x:Name="GameButton" DockPanel.Dock="Bottom" Click="OnGameClicked" Padding="8,6"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+          <StackPanel>
+            <TextBlock x:Name="GameLabel" FontSize="11" FontWeight="Normal"/>
+            <TextBlock x:Name="GameName" TextTrimming="CharacterEllipsis"/>
+          </StackPanel>
+        </Button>
+        <ListBox x:Name="SidebarList" Classes="sidebar" SelectionChanged="OnSidebarSelectionChanged"/>
+      </DockPanel>
+    </Border>
+
+    <Panel Background="{StaticResource MainBrush}">
+      <!-- A package, opened to install. -->
+      <DockPanel x:Name="PackageView" Margin="20,16" IsVisible="False">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8"
+                    Margin="0,12,0,0">
+          <Button x:Name="ClosePackageButton" Click="OnClosePackageClicked"/>
+          <Button x:Name="InstallButton" Click="OnInstallClicked" IsDefault="True"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="2">
+          <TextBlock x:Name="PackageName" Classes="title"/>
+          <TextBlock x:Name="PackageMeta" Classes="meta"/>
+          <TextBlock x:Name="PackageDescription" TextWrapping="Wrap" Margin="0,6,0,0"/>
+          <TextBlock x:Name="PackageWarning" Classes="warning" Margin="0,6,0,0"/>
+        </StackPanel>
+        <HeaderedContentControl x:Name="PackageFrame" Theme="{StaticResource GroupFrame}" Margin="0,12,0,0">
+          <ScrollViewer>
+            <StackPanel x:Name="PackageRows"/>
+          </ScrollViewer>
+        </HeaderedContentControl>
+      </DockPanel>
+
+      <!-- An install under way. -->
+      <StackPanel x:Name="ProgressView" Margin="40" Spacing="12" VerticalAlignment="Center" IsVisible="False">
+        <TextBlock x:Name="ProgressTitle" Classes="title"/>
+        <ProgressBar x:Name="ProgressBar" Minimum="0"/>
+        <TextBlock x:Name="ProgressFile" Classes="meta" TextTrimming="CharacterEllipsis"/>
+      </StackPanel>
+
+      <!-- What an install did. -->
+      <DockPanel x:Name="SummaryView" Margin="20,16" IsVisible="False">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+          <Button x:Name="DoneButton" Click="OnDoneClicked" IsDefault="True"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="2">
+          <TextBlock x:Name="SummaryTitle" Classes="title"/>
+          <TextBlock x:Name="SummaryHint" Classes="meta"/>
+        </StackPanel>
+        <HeaderedContentControl x:Name="SummaryFrame" Theme="{StaticResource GroupFrame}" Margin="0,12,0,0">
+          <ScrollViewer>
+            <StackPanel x:Name="SummaryRows"/>
+          </ScrollViewer>
+        </HeaderedContentControl>
+      </DockPanel>
+
+      <!-- Everything installed, and uninstalling it. -->
+      <DockPanel x:Name="InstalledView" Margin="20,16" IsVisible="False">
+        <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+          <TextBlock x:Name="InstalledTitle" Classes="title"/>
+          <TextBlock x:Name="InstalledStatus" Classes="meta"/>
+          <TextBlock x:Name="InstalledProblems" Classes="warning"/>
+        </StackPanel>
+        <TextBlock x:Name="InstalledEmpty" DockPanel.Dock="Top" Classes="meta"/>
+        <Grid ColumnDefinitions="220,16,*">
+          <ListBox x:Name="InstalledList" Classes="list" SelectionChanged="OnInstalledSelectionChanged"/>
+          <DockPanel Grid.Column="2" x:Name="InstalledDetails" IsVisible="False">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+              <Button x:Name="UninstallButton" Click="OnUninstallClicked"/>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Top" Spacing="2">
+              <TextBlock x:Name="InstalledName" Classes="title" FontSize="18"/>
+              <TextBlock x:Name="InstalledMeta" Classes="meta"/>
+            </StackPanel>
+            <HeaderedContentControl x:Name="InstalledFrame" Theme="{StaticResource GroupFrame}" Margin="0,12,0,0">
+              <ScrollViewer>
+                <StackPanel x:Name="InstalledRows"/>
+              </ScrollViewer>
+            </HeaderedContentControl>
+          </DockPanel>
+        </Grid>
+      </DockPanel>
+
+      <!-- Making a package from a folder. -->
+      <DockPanel x:Name="PackView" Margin="20,16" IsVisible="False">
+        <StackPanel DockPanel.Dock="Top" Spacing="4">
+          <TextBlock x:Name="PackTitle" Classes="title"/>
+          <TextBlock x:Name="PackIntro" Classes="meta"/>
+        </StackPanel>
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+          <Button x:Name="SavePackageButton" DockPanel.Dock="Right" Click="OnSavePackageClicked" IsEnabled="False"/>
+          <TextBlock x:Name="PackStatus" Classes="meta" VerticalAlignment="Center"/>
+        </DockPanel>
+        <Grid ColumnDefinitions="260,16,*" Margin="0,12,0,0">
+          <HeaderedContentControl x:Name="DetailsFrame" Theme="{StaticResource GroupFrame}">
+            <ScrollViewer>
+              <StackPanel x:Name="FormFields">
+                <TextBlock x:Name="NameLabel" Classes="label"/>
+                <TextBox x:Name="NameBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="AuthorLabel" Classes="label"/>
+                <TextBox x:Name="AuthorBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="DateLabel" Classes="label"/>
+                <TextBox x:Name="DateBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="IdLabel" Classes="label" TextWrapping="Wrap"/>
+                <TextBox x:Name="IdBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="VersionLabel" Classes="label"/>
+                <TextBox x:Name="VersionBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="DescriptionLabel" Classes="label"/>
+                <TextBox x:Name="DescriptionBox" TextChanged="OnFormChanged" AcceptsReturn="True" TextWrapping="Wrap"
+                         MinHeight="60"/>
+                <TextBlock x:Name="LicenseLabel" Classes="label"/>
+                <TextBox x:Name="LicenseBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="SourceUrlLabel" Classes="label"/>
+                <TextBox x:Name="SourceUrlBox" TextChanged="OnFormChanged"/>
+                <TextBlock x:Name="FormProblems" Classes="warning" Margin="0,8,0,0"/>
+              </StackPanel>
+            </ScrollViewer>
+          </HeaderedContentControl>
+          <DockPanel Grid.Column="2">
+            <DockPanel DockPanel.Dock="Top">
+              <Button x:Name="ChooseFolderButton" DockPanel.Dock="Right" Click="OnChooseFolderClicked"/>
+              <TextBlock x:Name="PackFolder" Classes="meta" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                         TextWrapping="NoWrap"
+                         Margin="0,0,8,0"/>
+            </DockPanel>
+            <TextBlock x:Name="PackLeftOut" DockPanel.Dock="Bottom" Classes="meta" TextWrapping="Wrap" Margin="0,6,0,0"/>
+            <HeaderedContentControl x:Name="PackFrame" Theme="{StaticResource GroupFrame}" Margin="0,12,0,0">
+              <ScrollViewer>
+                <StackPanel x:Name="PackRows"/>
+              </ScrollViewer>
+            </HeaderedContentControl>
+          </DockPanel>
+        </Grid>
+      </DockPanel>
+    </Panel>
+  </DockPanel>
 </Window>

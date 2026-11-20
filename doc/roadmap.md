@@ -14,7 +14,7 @@ The first usable release: one Avalonia window that installs, manages, and makes
       verifying packages, and packing a folder by its layout with an extension fallback
 - [x] Install: find the game, route files by kind, back up clashes, update in place,
       keep receipts in the game folder, uninstall, and list
-- [ ] The app: a TS1-styled window with a Roundhouse-style title bar, interface text
+- [x] The app: a TS1-styled window with a Roundhouse-style title bar, interface text
       in `.cst` tables read with [CST.NET](https://github.com/tonytins/cstdotnet),
       install, manage, and pack
 
