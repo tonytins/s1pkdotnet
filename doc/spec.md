@@ -164,8 +164,8 @@ works from a folder of content:
    `GameData/Floors/` give `skin`, `wall`, and `floor`. Folder names are matched
    ignoring case.
 2. Any other file takes its kind from its extension, as in the table under
-   [Kinds](#kinds). A `.bmp` outside a skins folder has no kind, since it could
-   be anything.
+   [Kinds](#kinds). A `.bmp` is taken for a skin texture, since the game keeps
+   skin textures as `.bmp` files beside the meshes in `GameData/Skins/`.
 3. A file neither rule places can't be packed.
 
 It leaves out files whose names start with a dot, `Thumbs.db`, `desktop.ini`,

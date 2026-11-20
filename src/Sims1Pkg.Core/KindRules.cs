@@ -16,6 +16,7 @@ public static class KindRules
         [".bcf"] = ContentKind.Skin,
         [".bmf"] = ContentKind.Skin,
         [".cfp"] = ContentKind.Skin,
+        [".bmp"] = ContentKind.Skin,
     };
 
     /// <summary>
@@ -26,8 +27,9 @@ public static class KindRules
     /// <c>GameData/Floors/</c> give <see cref="ContentKind.Skin"/>, <see cref="ContentKind.Wall"/>, and
     /// <see cref="ContentKind.Floor"/>. Folder names are matched ignoring case.</item>
     /// <item>Any other file takes its kind from its extension: <c>.iff</c> and <c>.far</c> are objects,
-    /// <c>.wll</c> walls, <c>.flr</c> floors, and <c>.cmx</c>, <c>.skn</c>, <c>.bcf</c>, <c>.bmf</c>, and
-    /// <c>.cfp</c> skins.</item>
+    /// <c>.wll</c> walls, <c>.flr</c> floors, and <c>.cmx</c>, <c>.skn</c>, <c>.bcf</c>, <c>.bmf</c>, <c>.cfp</c>,
+    /// and <c>.bmp</c> skins. The game keeps skin textures as <c>.bmp</c> files beside the meshes in
+    /// <c>GameData/Skins</c>, so a loose <c>.bmp</c> is taken for one.</item>
     /// </list>
     /// </summary>
     /// <param name="archivePath">The path relative to the source folder, with forward slashes.</param>

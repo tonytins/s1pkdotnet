@@ -15,4 +15,6 @@ packages for The Sims Complete Collection, on Windows, Linux, and macOS.
   will go.
 - Every install, update, and uninstall is undone if it fails partway.
 - Interface text comes from `.cst` tables, so it can be translated.
+- Skin textures (`.bmp`) are packed as skins wherever they sit in the
+  folder, not only under `GameData/Skins`.
 - [Format version 1](doc/spec.md) of `.s1pk`.

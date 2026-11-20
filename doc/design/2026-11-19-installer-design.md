@@ -1,6 +1,6 @@
 # Sims1Pkg installer: design
 
-> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestone:** Kodama (0.1.1xx) · **Amended:** 2026-11-19, GUI only, with packing in the GUI
+> **Status:** approved 2026-11-19 · **Date:** 2026-11-19 · **Milestone:** Kodama (0.1.1xx) · **Amended:** 2026-11-19, GUI only, with packing in the GUI; 2026-11-19, loose `.bmp` files pack as skins (0.1.2xx)
 
 Sims1Pkg (S1PK) is a one-file installer for The Sims 1 custom content. This document says what the installer does,
 why, and how it gets built, so the plan for Kodama can be made from it.
@@ -104,8 +104,8 @@ Code-behind was chosen because it's the smallest thing that works, and it matche
   own folder names: `Downloads/` gives `object`, `GameData/Skins/` gives `skin`, `GameData/Walls/` gives `wall`, and
   `GameData/Floors/` gives `floor`, matched without regard to case.
 - Files outside those folders fall back to their extension: `.iff` and `.far` give `object`, `.wll` gives `wall`,
-  `.flr` gives `floor`, and `.cmx`, `.skn`, `.bcf`, `.bmf`, and `.cfp` give `skin`.
-- A file neither rule places, such as a loose `.bmp`, can't be packed. The form marks it, says which folders would
+  `.flr` gives `floor`, and `.cmx`, `.skn`, `.bcf`, `.bmf`, `.cfp`, and `.bmp` give `skin`.
+- A file neither rule places, such as a loose `.txt`, can't be packed. The form marks it, says which folders would
   place it, and keeps *Save package…* disabled until every file is placed.
 
 ### Finding the game

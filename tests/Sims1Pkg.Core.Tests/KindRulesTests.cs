@@ -20,12 +20,14 @@ public sealed class KindRulesTests
     [InlineData("B001.bcf", ContentKind.Skin)]
     [InlineData("B001.bmf", ContentKind.Skin)]
     [InlineData("B001.cfp", ContentKind.Skin)]
+    [InlineData("B001.bmp", ContentKind.Skin)]
+    [InlineData("textures/face.BMP", ContentKind.Skin)]
     [InlineData("GameData/Objects/Booth.iff", ContentKind.Object)]
     public void ExtensionIsTheFallback(string path, ContentKind expected) => Assert.Equal(expected, KindRules.GetKind(path));
 
     [Theory]
-    [InlineData("face.bmp")]
     [InlineData("readme.txt")]
+    [InlineData("preview.png")]
     [InlineData("Downloads")]
     [InlineData("GameData/Skins")]
     public void UnplacedFilesHaveNoKind(string path) => Assert.Null(KindRules.GetKind(path));

@@ -65,7 +65,7 @@ macOS.
 
 **0.1.2xx, skins and About**
 
-- [ ] Loose `.bmp` files pack as skins, since skins need their textures. A
+- [x] Loose `.bmp` files pack as skins, since skins need their textures. A
   `.bmp` anywhere outside the game's own folders takes `skin` by its
   extension; the pack preview shows where each one will go. `skin` is
   already a kind, so `formatVersion` stays 1 and older readers install these
@@ -92,9 +92,10 @@ research before they're planned.
 
 ## Risks
 
-- A creator's folder that holds a `.bmp` that isn't a skin texture, such as a
-  preview picture or a readme image, packs it as a skin once 0.1.2xx lands.
-  The pack preview shows its destination, so it's caught there or not at all.
+- A `.bmp` in a creator's folder that isn't a skin texture, such as a preview
+  picture, packs as a skin. TS1 keeps skin textures as plain `.bmp` files
+  (138 of them in a Complete Collection's `GameData/Skins`), so the extension
+  can't tell them apart; the pack preview shows each file's destination.
 - Only the Complete Collection from CD has been checked; a Wine install may
   use different casing than `GameInstall` expects.
 - Windows and macOS builds can't be run from Linux, so they're checked less
@@ -104,4 +105,5 @@ research before they're planned.
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-11-19 | patch | 0.1.2xx begins, and loose `.bmp` files pack as skins, checked against a Complete Collection's `GameData/Skins`. |
 | 2026-11-19 | major | The roadmap is retooled around feature bands, after VentureOS's: releases with code names, bands with checklists, and an Ideas list. Kodama and Hikari's finished work becomes 0.1.1xx. 0.1.2xx, skins and About, is next. Hikari is kept for 0.2, and Nozomi is saved for a later release; its ideas move to Ideas, with registering `.s1pk` on Windows. |

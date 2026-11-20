@@ -32,11 +32,33 @@ public sealed class PackageWriterTests
     }
 
     [Fact]
+    public async Task PacksLooseSkinTexturesAsSkins()
+    {
+        using var source = new TempFolder();
+        using var output = new TempFolder();
+        source.Write("B001FAFitlgt_01.cmx", "mesh");
+        source.Write("textures/B001FAFitlgt_01.bmp", "texture");
+        string packagePath = Path.Combine(output.Path, "outfit.s1pk");
+
+        await PackageWriter.PackAsync(source.Path, packagePath, Samples.Details("maya.outfit"), cancellationToken: Token);
+
+        using Package package = Package.Open(packagePath);
+        await package.VerifyAsync(Token);
+        Assert.Equal(
+            [
+                ("B001FAFitlgt_01.cmx", "skin", "GameData/Skins/B001FAFitlgt_01.cmx"),
+                ("textures/B001FAFitlgt_01.bmp", "skin", "GameData/Skins/B001FAFitlgt_01.bmp"),
+            ],
+            package.Manifest.Files.Select(file =>
+                (file.Path, file.KindName, GameLayout.GetDestination(file.Path, ContentKind.Skin, "maya.outfit"))));
+    }
+
+    [Fact]
     public void PreviewMarksFilesThatCantBePacked()
     {
         using var source = new TempFolder();
         source.Write("Booth.iff", "booth");
-        source.Write("face.bmp", "face");
+        source.Write("readme.txt", "read me");
         source.Write("Tile.wll", "a");
         source.Write("walls/Tile.wll", "b");
 
@@ -47,7 +69,7 @@ public sealed class PackageWriterTests
             [
                 ("Booth.iff", (PackProblem?)null),
                 ("Tile.wll", PackProblem.NameClash),
-                ("face.bmp", PackProblem.NoKind),
+                ("readme.txt", PackProblem.NoKind),
                 ("walls/Tile.wll", PackProblem.NameClash),
             ],
             preview.Items.Select(item => (item.ArchivePath, item.Problem)));
@@ -105,12 +127,12 @@ public sealed class PackageWriterTests
         using var source = new TempFolder();
         using var output = new TempFolder();
         source.Write("Booth.iff", "booth");
-        source.Write("face.bmp", "face");
+        source.Write("readme.txt", "read me");
 
         var error = await Assert.ThrowsAsync<PackageFormatException>(() =>
             PackageWriter.PackAsync(source.Path, Path.Combine(output.Path, "x.s1pk"), Samples.Details(), cancellationToken: Token));
 
-        Assert.Contains("face.bmp", error.Message);
+        Assert.Contains("readme.txt", error.Message);
         Assert.Empty(output.ListFiles());
     }
 
