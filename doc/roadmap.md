@@ -12,7 +12,7 @@ The first usable release: one Avalonia window that installs, manages, and makes
 - [x] Scaffolding: solution layout, format model, game layout
 - [x] Package format: the manifest with format version and package id, reading and
       verifying packages, and packing a folder by its layout with an extension fallback
-- [ ] Install: find the game, route files by kind, back up clashes, update in place,
+- [x] Install: find the game, route files by kind, back up clashes, update in place,
       keep receipts in the game folder, uninstall, and list
 - [ ] The app: a TS1-styled window with a Roundhouse-style title bar, interface text
       in `.cst` tables read with [CST.NET](https://github.com/tonytins/cstdotnet),

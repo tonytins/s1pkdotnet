@@ -110,8 +110,11 @@ Code-behind was chosen because it's the smallest thing that works, and it matche
 
 ### Finding the game
 
-- In order: `TS1_GAME_DIR`; on Windows, `C:\Program Files (x86)\Maxis\The Sims Complete Collection`; then the folder
-  the player chose last time.
+- In order: `TS1_GAME_DIR`; then the folder the player chose last time; then on Windows,
+  `C:\Program Files (x86)\Maxis\The Sims Complete Collection`. (Amended while building: with the default before
+  the player's choice, a Windows player who picked a second install would have been ignored.)
+- A game folder holds `GameData` and `UserData`, in any case. The Complete Collection install has no `Sims.exe` at its
+  root, so that isn't the check.
 - If none is a game folder, the GUI asks the player to pick one once and remembers it.
 - The game shown at the bottom of the sidebar can be clicked to choose another.
 

@@ -1,6 +1,4 @@
 using System.Globalization;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Sims1Pkg;
@@ -29,6 +27,11 @@ public static class ManifestXml
     private const string RootName = "S1Package";
     private const string DateFormat = "yyyy-MM-dd";
 
+    private static readonly XmlFieldReader Fields =
+        new(PackageFormat.ManifestFileName, (message, inner) => inner is null
+            ? new PackageFormatException(message)
+            : new PackageFormatException(message, inner));
+
     /// <summary>
     /// Reads a manifest.
     /// </summary>
@@ -41,15 +44,10 @@ public static class ManifestXml
     {
         ArgumentNullException.ThrowIfNull(stream);
 
-        XElement root = Load(stream);
-        if (root.Name != RootName)
-        {
-            throw new PackageFormatException($"manifest.xml starts with <{root.Name}>, not <{RootName}>.");
-        }
+        XElement root = Fields.Load(stream, RootName);
+        Fields.CheckFormatVersion(root, PackageFormat.CurrentVersion);
 
-        ReadFormatVersion(root);
-
-        string? sourceUrlText = Optional(root, "SourceUrl");
+        string? sourceUrlText = Fields.Optional(root, "SourceUrl");
         Uri? sourceUrl = null;
         if (sourceUrlText is not null &&
             (!Uri.TryCreate(sourceUrlText, UriKind.Absolute, out sourceUrl) || !PackageDetails.IsWebAddress(sourceUrl)))
@@ -57,7 +55,7 @@ public static class ManifestXml
             throw new PackageFormatException($"SourceUrl '{sourceUrlText}' is not a web address.");
         }
 
-        string dateText = Required(root, "Date");
+        string dateText = Fields.Required(root, "Date");
         if (!DateOnly.TryParseExact(dateText, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date))
         {
             throw new PackageFormatException($"Date '{dateText}' isn't a date written as YYYY-MM-DD.");
@@ -65,13 +63,13 @@ public static class ManifestXml
 
         var details = new PackageDetails
         {
-            Id = Optional(root, "Id"),
-            Name = Required(root, "Name"),
-            Author = Required(root, "Author"),
+            Id = Fields.Optional(root, "Id"),
+            Name = Fields.Required(root, "Name"),
+            Author = Fields.Required(root, "Author"),
             Date = date,
-            Version = Optional(root, "Version"),
-            Description = Optional(root, "Description"),
-            License = Optional(root, "License"),
+            Version = Fields.Optional(root, "Version"),
+            Description = Fields.Optional(root, "Description"),
+            License = Fields.Optional(root, "License"),
             SourceUrl = sourceUrl,
         };
 
@@ -107,14 +105,14 @@ public static class ManifestXml
         var root = new XElement(
             RootName,
             new XAttribute("formatVersion", PackageFormat.CurrentVersion.ToString(CultureInfo.InvariantCulture)),
-            OptionalElement("Id", details.Id),
+            XmlFieldReader.OptionalElement("Id", details.Id),
             new XElement("Name", details.Name),
             new XElement("Author", details.Author),
             new XElement("Date", details.Date.ToString(DateFormat, CultureInfo.InvariantCulture)),
-            OptionalElement("Version", details.Version),
-            OptionalElement("Description", details.Description),
-            OptionalElement("License", details.License),
-            OptionalElement("SourceUrl", details.SourceUrl?.AbsoluteUri),
+            XmlFieldReader.OptionalElement("Version", details.Version),
+            XmlFieldReader.OptionalElement("Description", details.Description),
+            XmlFieldReader.OptionalElement("License", details.License),
+            XmlFieldReader.OptionalElement("SourceUrl", details.SourceUrl?.AbsoluteUri),
             new XElement("Files", manifest.Files.Select(file => new XElement(
                 "File",
                 new XAttribute("path", file.Path),
@@ -122,65 +120,20 @@ public static class ManifestXml
                 new XAttribute("size", file.Length.ToString(CultureInfo.InvariantCulture)),
                 new XAttribute("sha256", file.Sha256)))));
 
-        var settings = new XmlWriterSettings
-        {
-            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
-            Indent = true,
-            CloseOutput = false,
-        };
-
-        using var writer = XmlWriter.Create(stream, settings);
-        new XDocument(root).Save(writer);
-    }
-
-    private static XElement Load(Stream stream)
-    {
-        var settings = new XmlReaderSettings
-        {
-            DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null,
-            CloseInput = false,
-        };
-
-        try
-        {
-            using var reader = XmlReader.Create(stream, settings);
-            return XDocument.Load(reader).Root
-                ?? throw new PackageFormatException("manifest.xml is empty.");
-        }
-        catch (XmlException exception)
-        {
-            throw new PackageFormatException("manifest.xml isn't valid XML: " + exception.Message, exception);
-        }
-    }
-
-    private static void ReadFormatVersion(XElement root)
-    {
-        string? text = root.Attribute("formatVersion")?.Value;
-        if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out int version) || version < 1)
-        {
-            throw new PackageFormatException("manifest.xml has no valid formatVersion.");
-        }
-
-        if (version > PackageFormat.CurrentVersion)
-        {
-            throw new PackageFormatException(
-                $"This package uses format version {version}, and this version of Sims1Pkg reads up to " +
-                $"{PackageFormat.CurrentVersion}. Install a newer Sims1Pkg to open it.");
-        }
+        XmlFieldReader.Save(root, stream);
     }
 
     private static List<PackageFile> ReadFiles(XElement root)
     {
-        XElement files = Single(root, "Files")
+        XElement files = Fields.Single(root, "Files")
             ?? throw new PackageFormatException("manifest.xml has no <Files> element.");
 
         var result = new List<PackageFile>();
         foreach (XElement file in files.Elements("File"))
         {
-            string path = RequiredAttribute(file, "path", "a <File>");
+            string path = Fields.RequiredAttribute(file, "path", "A <File>");
             string where = $"<File path=\"{path}\">";
-            string sizeText = RequiredAttribute(file, "size", where);
+            string sizeText = Fields.RequiredAttribute(file, "size", where);
 
             if (!long.TryParse(sizeText, NumberStyles.None, CultureInfo.InvariantCulture, out long size))
             {
@@ -189,52 +142,11 @@ public static class ManifestXml
 
             result.Add(new PackageFile(
                 path,
-                RequiredAttribute(file, "kind", where),
+                Fields.RequiredAttribute(file, "kind", where),
                 size,
-                RequiredAttribute(file, "sha256", where).ToLowerInvariant()));
+                Fields.RequiredAttribute(file, "sha256", where).ToLowerInvariant()));
         }
 
         return result;
     }
-
-    private static XElement? Single(XElement parent, string name)
-    {
-        XElement? first = null;
-        foreach (XElement element in parent.Elements(name))
-        {
-            if (first is not null)
-            {
-                throw new PackageFormatException($"manifest.xml has more than one <{name}>.");
-            }
-
-            first = element;
-        }
-
-        return first;
-    }
-
-    private static string Required(XElement parent, string name)
-    {
-        string? value = Optional(parent, name);
-        return string.IsNullOrWhiteSpace(value)
-            ? throw new PackageFormatException($"manifest.xml has no <{name}>.")
-            : value;
-    }
-
-    private static string? Optional(XElement parent, string name)
-    {
-        string? value = Single(parent, name)?.Value;
-        return string.IsNullOrEmpty(value) ? null : value;
-    }
-
-    private static string RequiredAttribute(XElement element, string name, string where)
-    {
-        string? value = element.Attribute(name)?.Value;
-        return string.IsNullOrEmpty(value)
-            ? throw new PackageFormatException($"{where} has no {name}.")
-            : value;
-    }
-
-    private static XElement? OptionalElement(string name, string? value) =>
-        string.IsNullOrEmpty(value) ? null : new XElement(name, value);
 }

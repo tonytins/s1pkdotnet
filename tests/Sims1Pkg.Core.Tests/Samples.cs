@@ -57,4 +57,20 @@ internal static class Samples
         PackageManifest manifest = new(Details(), files.Select(file => File(file.Path, file.Contents)).ToList());
         return Zip(folder, files.Append((PackageFormat.ManifestFileName, ManifestText(manifest))));
     }
+
+    /// <summary>
+    /// Packs <paramref name="files"/>, by path and contents, into a package in <paramref name="output"/> and opens it.
+    /// </summary>
+    public static async Task<Package> PackAsync(TempFolder output, PackageDetails details, params (string Path, string Contents)[] files)
+    {
+        using var source = new TempFolder();
+        foreach ((string path, string contents) in files)
+        {
+            source.Write(path, contents);
+        }
+
+        string packagePath = System.IO.Path.Combine(output.Path, Guid.NewGuid().ToString("N") + ".s1pk");
+        await PackageWriter.PackAsync(source.Path, packagePath, details);
+        return Sims1Pkg.Package.Open(packagePath);
+    }
 }

@@ -10,8 +10,9 @@ later.
 
 - **`Sims1Pkg.Core`** is the library. It owns the format (`PackageManifest`,
   `PackageDetails`, `PackageFile`, `ContentKind`, `ManifestXml`, `ArchivePath`, `PackageIds`),
-  reading and verifying packages (`Package`), packing (`PackageWriter`, `KindRules`), and the
-  game's folder layout (`GameLayout`, `GameInstall`). It must stay free of `Console`, dialogs, and other UI, so the GUI and other
+  reading and verifying packages (`Package`), packing (`PackageWriter`, `KindRules`), the
+  game's folder layout (`GameLayout`, `GameInstall`, `GameLocator`), and installing
+  (`Installer`, `Receipts`), where every change goes through a `Journal` that can undo it. It must stay free of `Console`, dialogs, and other UI, so the GUI and other
   programs can both use it. It reports results through return values and
   exceptions.
 - **The GUI** (`Sims1Pkg.Gui`, coming in Kodama) is the only front end: an Avalonia app that installs, manages, and
@@ -89,6 +90,10 @@ that leaves stray files is worse than one that refuses to start.
 - **Paths are case-sensitive on Linux.** A Wine install may not use the casing written in
   `GameInstall`.
 - **Don't commit files from a game install.**
+- **Never verify against a real install by accident.** `GameLocator` reads `TS1_GAME_DIR`
+  first, and on a developer's machine that's their real game. Scratch programs that install
+  into a copy build `new GameInstall(copyPath)` directly, run with `TS1_GAME_DIR` unset, and
+  refuse any root outside the scratch folder.
 
 ### Format Rules
 
