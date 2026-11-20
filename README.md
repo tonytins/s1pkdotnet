@@ -60,3 +60,7 @@ please mention the game version and install type you tested against.
 In jurisdictions that recognize copyright waivers, I've
 [waived all copyright](UNLICENSE) and related or neighboring rights to this
 project. Where these waivers aren't recognized, [BSD-3-Clause](COPYING) applies.
+
+The app bundles [Comic Neue](https://github.com/crozynski/comicneue), copyright
+The Comic Neue Project Authors, under the
+[SIL Open Font License 1.1](src/Sims1Pkg.Gui/Assets/Fonts/OFL.txt).

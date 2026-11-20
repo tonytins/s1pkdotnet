@@ -18,6 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Comic Neue, in place of the Comic Sans the Maxis-era tools used. SIL Open Font License 1.1; see OFL.txt. -->
+    <AvaloniaResource Include="Assets/Fonts/*.ttf" />
+    <None Include="Assets/Fonts/OFL.txt" CopyToOutputDirectory="PreserveNewest" Link="licenses/ComicNeue-OFL.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- One folder of tables per language, beside the app. -->
     <None Include="uitext\**\*.cst" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
