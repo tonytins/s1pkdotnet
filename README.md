@@ -64,6 +64,9 @@ dotnet test
 dotnet run --project src/Sims1Pkg.Gui
 ```
 
+To build the packages people download (an AppImage and tar.gz for Linux, a zip
+for Windows, and an app for macOS), see [packaging](packaging/README.md).
+
 ## Project layout
 
 | Path                     | What it is                                            |
@@ -74,6 +77,9 @@ dotnet run --project src/Sims1Pkg.Gui
 | `tests/Sims1Pkg.Gui.Tests`  | xUnit tests for the app's logic and text           |
 | `doc/roadmap.md`         | What's done and what's next                           |
 | `doc/design/`            | Approved designs                                      |
+| `doc/spec.md`            | The `.s1pk` format specification                      |
+| `packaging/`             | Scripts that build the downloadable packages          |
+| `changelog.md`           | What each release changed                             |
 
 ## Contributing
 

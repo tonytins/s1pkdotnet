@@ -9,10 +9,41 @@ namespace Sims1Pkg.Gui;
 public static class Program
 {
     /// <summary>
-    /// Runs the app. The first argument, if any, is a package to open.
+    /// The version, from GitInfo, as major.minor.patch.
+    /// </summary>
+    public static string Version =>
+        $"{ThisAssembly.Git.SemVer.Major}.{ThisAssembly.Git.SemVer.Minor}.{ThisAssembly.Git.SemVer.Patch}";
+
+    /// <summary>
+    /// Runs the app. The first argument, if any, is a package to open. <c>--version</c> prints the version and checks
+    /// the app's own files are in place, with no window, which the packaging scripts use as a smoke test.
     /// </summary>
     [STAThread]
-    public static int Main(string[] args) => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    public static int Main(string[] args) =>
+        args is ["--version"] ? PrintVersion() : BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+
+    private static int PrintVersion()
+    {
+        Console.WriteLine($"Sims1Pkg {Version} (format {PackageFormat.CurrentVersion})");
+
+        string[] missing =
+        [
+            .. new[] { "uitext/english.dir/_100_sims1pkg.cst", "licenses/ComicNeue-OFL.txt" }
+                .Where(file => !File.Exists(Path.Combine(AppContext.BaseDirectory, file))),
+        ];
+
+        if (!InterfaceText.Load().Has(TextKeys.AppTitle))
+        {
+            missing = [.. missing, "the interface text's app title"];
+        }
+
+        foreach (string file in missing)
+        {
+            Console.Error.WriteLine($"Sims1Pkg: {file} is missing.");
+        }
+
+        return missing.Length == 0 ? 0 : 1;
+    }
 
     /// <summary>
     /// Comic Neue, bundled with the app, as the font for everything.

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
 
 namespace Sims1Pkg.Gui;
 
@@ -17,7 +18,20 @@ public sealed class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow(desktop.Args ?? []);
+            var window = new MainWindow(desktop.Args ?? []);
+            desktop.MainWindow = window;
+
+            // macOS opens a document by sending an event rather than an argument, both at launch and while running.
+            if (TryGetFeature(typeof(IActivatableLifetime)) is IActivatableLifetime activatable)
+            {
+                activatable.Activated += async (_, e) =>
+                {
+                    if (e is FileActivatedEventArgs { Files: [{ } file, ..] } && file.TryGetLocalPath() is { } path)
+                    {
+                        await window.OpenPackageAsync(path);
+                    }
+                };
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -6,6 +6,8 @@
     <RootNamespace>Sims1Pkg.Gui</RootNamespace>
     <Description>Installs, manages, and makes S1PK packages of Sims 1 custom content.</Description>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- A placeholder until Sims1Pkg has its own art; packaging/icons.sh makes it from Assets/Sims1Pkg.png. -->
+    <ApplicationIcon>Assets/Sims1Pkg.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +22,7 @@
   <ItemGroup>
     <!-- Comic Neue, in place of the Comic Sans the Maxis-era tools used. SIL Open Font License 1.1; see OFL.txt. -->
     <AvaloniaResource Include="Assets/Fonts/*.ttf" />
+    <AvaloniaResource Include="Assets/Sims1Pkg.png" />
     <None Include="Assets/Fonts/OFL.txt" CopyToOutputDirectory="PreserveNewest" Link="licenses/ComicNeue-OFL.txt" />
   </ItemGroup>
 

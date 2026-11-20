@@ -334,7 +334,10 @@ public sealed partial class MainWindow : Window
 
     // A package before installing
 
-    private async Task OpenPackageAsync(string path)
+    /// <summary>
+    /// Opens a package and shows it, or reports why it can't be opened.
+    /// </summary>
+    internal async Task OpenPackageAsync(string path)
     {
         try
         {

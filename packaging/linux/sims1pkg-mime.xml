@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Tells the desktop that .s1pk files are Sims1Pkg packages, so a file manager opens them with Sims1Pkg. -->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-sims1pkg">
+    <comment>Sims1Pkg package</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.s1pk"/>
+    <icon name="Sims1Pkg"/>
+  </mime-type>
+</mime-info>

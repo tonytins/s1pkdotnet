@@ -21,7 +21,11 @@ The first usable release: one Avalonia window that installs, manages, and makes
 ## Hikari: getting it to players
 
 - [x] Format specification in [`doc/spec.md`](spec.md)
-- [ ] Open `.s1pk` files from the file manager on Linux and Windows
+- [x] Packages for Linux (AppImage and tar.gz), Windows (zip), and macOS (app), from
+      [packaging/](../packaging/README.md)
+- [x] Open `.s1pk` files from the file manager on Linux (through the desktop entry and
+      MIME type) and macOS (through `Info.plist`)
+- [ ] Register `.s1pk` on Windows, which needs an installer; until then, *Open with*
 
 ## Nozomi: beyond copying files
 
