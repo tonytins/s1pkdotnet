@@ -10,7 +10,7 @@ The first usable release: one Avalonia window that installs, manages, and makes
 `.s1pk` packages on a Complete Collection install.
 
 - [x] Scaffolding: solution layout, format model, game layout
-- [ ] Package format: the manifest with format version and package id, reading and
+- [x] Package format: the manifest with format version and package id, reading and
       verifying packages, and packing a folder by its layout with an extension fallback
 - [ ] Install: find the game, route files by kind, back up clashes, update in place,
       keep receipts in the game folder, uninstall, and list

@@ -28,12 +28,6 @@ public sealed class GameInstall
     /// <param name="kind">The kind of content.</param>
     /// <returns>A full path inside <see cref="RootDirectory"/>.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a defined value.</exception>
-    public string GetContentDirectory(ContentKind kind) => kind switch
-    {
-        ContentKind.Object => Path.Combine(RootDirectory, "Downloads"),
-        ContentKind.Skin => Path.Combine(RootDirectory, "GameData", "Skins"),
-        ContentKind.Wall => Path.Combine(RootDirectory, "GameData", "Walls"),
-        ContentKind.Floor => Path.Combine(RootDirectory, "GameData", "Floors"),
-        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown content kind."),
-    };
+    public string GetContentDirectory(ContentKind kind) =>
+        Path.Combine(RootDirectory, GameLayout.GetFolder(kind).Replace('/', Path.DirectorySeparatorChar));
 }

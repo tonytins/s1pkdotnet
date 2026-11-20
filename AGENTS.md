@@ -8,9 +8,10 @@ that lists each file's kind, size, and SHA-256 hash. The installer uses the kind
 each file in the right game folder, and records what it installed so it can be removed
 later.
 
-- **`Sims1Pkg.Core`** is the library. It owns the format (`PackageFormat`,
-  `PackageManifest`, `PackageFile`, `ContentKind`) and the game's folder layout
-  (`GameInstall`). It must stay free of `Console`, dialogs, and other UI, so the GUI and other
+- **`Sims1Pkg.Core`** is the library. It owns the format (`PackageManifest`,
+  `PackageDetails`, `PackageFile`, `ContentKind`, `ManifestXml`, `ArchivePath`, `PackageIds`),
+  reading and verifying packages (`Package`), packing (`PackageWriter`, `KindRules`), and the
+  game's folder layout (`GameLayout`, `GameInstall`). It must stay free of `Console`, dialogs, and other UI, so the GUI and other
   programs can both use it. It reports results through return values and
   exceptions.
 - **The GUI** (`Sims1Pkg.Gui`, coming in Kodama) is the only front end: an Avalonia app that installs, manages, and
@@ -71,6 +72,9 @@ that leaves stray files is worse than one that refuses to start.
   folder ends up as it was.
 - **Record everything installed.** Every file the installer writes goes in the package's
   receipt, so uninstalling removes exactly that and nothing else.
+- **Report problems as values where an app shows them.** Problems with a package's details
+  or a file being packed are enums (`PackageDetailsProblem`, `PackProblem`), so the GUI can say
+  them in its own `.cst` text. Exception messages are English, for errors.
 - **Never install what you don't understand.** A file whose kind the reader doesn't
   know may be listed, but never installed.
 - **Add a focused regression test** for every install, uninstall, or malformed-package
@@ -88,12 +92,13 @@ that leaves stray files is worse than one that refuses to start.
 
 ### Format Rules
 
-- **Readers refuse a `FormatVersion` newer than `PackageFormat.CurrentVersion`.** Bump it
+- **Readers refuse a `formatVersion` newer than `PackageFormat.CurrentVersion`.** Bump it
   only when older readers can't safely read the new data.
 - **Prefer additions an older reader can safely ignore**, and say what an older reader
   does with each one.
-- **Change the docs along with the format.** The manifest and its rules live in the
-  roadmap until `doc/spec.md` is written.
+- **Change the docs along with the format.** Until `doc/spec.md` is written, the manifest's
+  rules live in the [installer design](doc/design/2026-11-19-installer-design.md) and the XML
+  comments on `ManifestXml`.
 
 ### Reference Material and Licensing
 

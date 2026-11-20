@@ -9,8 +9,8 @@ and players copy each file by hand into `Downloads`, `GameData/Skins`,
 that says what each file is, so the installer can put it in the right place, and
 take it out again later.
 
-> **Status:** being rebuilt from scratch. The format model exists, but packing,
-> installing, and the app itself aren't built yet. See the
+> **Status:** being rebuilt from scratch. The library can make, read, and verify
+> packages, but installing and the app itself aren't built yet. See the
 > [roadmap](doc/roadmap.md) and the [design](doc/design/2026-11-19-installer-design.md).
 
 ## The format at a glance

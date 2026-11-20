@@ -16,7 +16,7 @@ public static class PackageFormat
     public const string ManifestFileName = "manifest.xml";
 
     /// <summary>
-    /// Format version this library reads and writes.
+    /// Format version this library writes, and the newest it reads.
     /// </summary>
     public const int CurrentVersion = 1;
 }

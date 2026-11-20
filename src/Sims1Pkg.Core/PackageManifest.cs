@@ -1,52 +1,74 @@
+using System.Text.RegularExpressions;
+
 namespace Sims1Pkg;
 
 /// <summary>
 /// The contents of a package's <c>manifest.xml</c>: who made it and what it holds.
 /// </summary>
-public sealed record PackageManifest
+/// <param name="Details">Who made the package and what it's called.</param>
+/// <param name="Files">Every content file in the package. The manifest itself is not listed.</param>
+public sealed partial record PackageManifest(PackageDetails Details, IReadOnlyList<PackageFile> Files)
 {
     /// <summary>
-    /// Format version of the package. Readers refuse versions newer than they support.
+    /// Lists what's wrong with this manifest, in English, for error messages.
     /// </summary>
-    public int FormatVersion { get; init; } = PackageFormat.CurrentVersion;
+    /// <returns>An empty list when the manifest is valid.</returns>
+    public IReadOnlyList<string> GetProblems()
+    {
+        var problems = new List<string>();
 
-    /// <summary>
-    /// Name shown to players.
-    /// </summary>
-    public required string Name { get; init; }
+        foreach (PackageDetailsProblem problem in Details.GetProblems())
+        {
+            problems.Add(problem switch
+            {
+                PackageDetailsProblem.NameMissing => "The package has no name.",
+                PackageDetailsProblem.AuthorMissing => "The package has no author.",
+                PackageDetailsProblem.IdNotValid => $"'{Details.Id}' is not a valid package id.",
+                PackageDetailsProblem.SourceUrlNotWeb => $"'{Details.SourceUrl}' is not a web address.",
+                _ => problem.ToString(),
+            });
+        }
 
-    /// <summary>
-    /// Who made the content.
-    /// </summary>
-    public required string Author { get; init; }
+        if (Files.Count == 0)
+        {
+            problems.Add("The package lists no files.");
+        }
 
-    /// <summary>
-    /// Date the package was made.
-    /// </summary>
-    public required DateOnly Date { get; init; }
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (PackageFile file in Files)
+        {
+            if (ArchivePath.GetProblem(file.Path) is { } pathProblem)
+            {
+                problems.Add($"'{file.Path}': {pathProblem}");
+            }
+            else if (file.Path.Equals(PackageFormat.ManifestFileName, StringComparison.OrdinalIgnoreCase))
+            {
+                problems.Add($"'{file.Path}' can't be listed as a content file.");
+            }
+            else if (!seen.Add(file.Path))
+            {
+                problems.Add($"'{file.Path}' is listed more than once, ignoring case.");
+            }
 
-    /// <summary>
-    /// The content's own version, chosen by its author. Not the format version.
-    /// </summary>
-    public string? Version { get; init; }
+            if (string.IsNullOrWhiteSpace(file.KindName))
+            {
+                problems.Add($"'{file.Path}' has no kind.");
+            }
 
-    /// <summary>
-    /// Longer description shown before installing.
-    /// </summary>
-    public string? Description { get; init; }
+            if (file.Length < 0)
+            {
+                problems.Add($"'{file.Path}' has a negative size.");
+            }
 
-    /// <summary>
-    /// License the content is shared under.
-    /// </summary>
-    public string? License { get; init; }
+            if (!Sha256Pattern().IsMatch(file.Sha256))
+            {
+                problems.Add($"'{file.Path}' has a SHA-256 that isn't 64 lowercase hex digits.");
+            }
+        }
 
-    /// <summary>
-    /// Where the content was published.
-    /// </summary>
-    public Uri? SourceUrl { get; init; }
+        return problems;
+    }
 
-    /// <summary>
-    /// Every content file in the package. The manifest itself is not listed.
-    /// </summary>
-    public IReadOnlyList<PackageFile> Files { get; init; } = [];
+    [GeneratedRegex("^[0-9a-f]{64}$")]
+    private static partial Regex Sha256Pattern();
 }
