@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>Sims1Pkg</AssemblyName>
+    <RootNamespace>Sims1Pkg.Gui</RootNamespace>
+    <Description>Installs, manages, and makes S1PK packages of Sims 1 custom content.</Description>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Approved for the GUI, 2026-11-19, at Roundhouse's version. -->
+    <PackageReference Include="Avalonia" Version="12.1.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sims1Pkg.Core\Sims1Pkg.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Sims1Pkg.Gui.Tests" />
+  </ItemGroup>
+
+</Project>

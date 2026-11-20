@@ -1,0 +1,7 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Sims1Pkg.Gui.MainWindow"
+        Title="Sims1Pkg"
+        Width="760" Height="520">
+  <TextBlock Text="Sims1Pkg" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+</Window>
