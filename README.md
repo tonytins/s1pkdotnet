@@ -1,6 +1,6 @@
 <p align="center">
     <picture>
-      <img alt="Sims1Pkg" src="screenshot.png" width="200">
+      <img alt="Sims1Pkg" src="screenshot.png" width="500">
     </picture>
 </p>
 
