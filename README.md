@@ -1,4 +1,14 @@
-# Sims1Pkg
+<p align="center">
+    <picture>
+      <img alt="Sims1Pkg" src="screenshot.png" width="200">
+    </picture>
+</p>
+
+<h1 align="center">Sims1Pkg</h1>
+
+<p align="center">
+  <b>an open-source package manager for The Sims 1.</b>
+</p>
 
 Sims1Pkg (S1PK) is a one-file installer format for The Sims 1 custom content.
 
